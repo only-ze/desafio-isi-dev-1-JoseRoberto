@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import PathId
 from app.utils.location import location_of
 from app.db.database import get_db
-from app.schemas.players_schema import PlayerCreate, PlayerListQuery, PlayerOut, PlayerPage
+from app.schemas.players_schema import ConditionUpdate, PlayerCreate, PlayerListQuery, PlayerOut, PlayerPage, PlayerUpdate
 from app.services import player_service
 from app.services.player_mapper import to_player_out
 
@@ -30,3 +30,15 @@ def list_players(
 @router.get("/{id}", response_model=PlayerOut)
 def get_player(id: PathId, db: Session = Depends(get_db)):
     return to_player_out(player_service.get_player(db, id))
+
+@router.put("/{id}", response_model=PlayerOut)
+def update_player(id: PathId, data: PlayerUpdate, db: Session = Depends(get_db)):
+    return to_player_out(player_service.update_player(db, id, data))
+
+@router.patch("/{id}/condition", response_model=PlayerOut)
+def change_condition(id: PathId, data: ConditionUpdate, db: Session = Depends(get_db)):
+    return to_player_out(player_service.change_condition(db, id, data))
+
+@router.delete("/{id}", status_code=204, response_class=Response)
+def delete_player(id: PathId, db: Session = Depends(get_db)):
+    player_service.delete_player(db, id)

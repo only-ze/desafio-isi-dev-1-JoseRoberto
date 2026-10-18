@@ -1,6 +1,6 @@
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from app.schemas.validators_schema import Agility, Age, Rating, PlayerName, Money
+from app.schemas.validators_schema import Agility, Age, Rating, PlayerName, Money, check_agility_for_age
 from app.utils.validators import Condition, Position
 from app.schemas.validators_schema import (
     QueryAge, QueryInt, QueryLimit, QueryValue, SearchText, SortCriteria,
@@ -27,10 +27,9 @@ class PlayerCreate(BaseModel):
         
     @model_validator(mode="after")
     def check_cross_field_limits(self):
+        check_agility_for_age(self.age, self.agility)
         attributes = self.attributes()
         highest = max(attributes)
-        if self.age >= 35 and self.agility > 85:
-            raise ValueError("agility: com 35 anos ou mais, o máximo é 85")
         if sum(attributes) > 480:
             raise ValueError("a soma dos seis atributos não pode passar de 480")
         if self.potential < highest:
@@ -86,6 +85,19 @@ class PlayerListQuery(BaseModel):
     def free_filter(self) -> bool | None:
         return None if self.free is None else self.free == "true"
 
+class PlayerUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    name: PlayerName
+    position: Position
+    agility: Agility
+    age: Age
+
+    @model_validator(mode="after")
+    def check_agility(self):
+        check_agility_for_age(self.age, self.agility)
+        return self
+    
 class PageMeta(BaseModel):
     page: int
     limit: int
@@ -95,3 +107,7 @@ class PageMeta(BaseModel):
 class PlayerPage(BaseModel):
     data: list[PlayerOut]
     meta: PageMeta
+    
+class ConditionUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    condition: Condition

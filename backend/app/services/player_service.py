@@ -3,11 +3,13 @@ from sqlalchemy.orm import Session
 from app.utils.player_value import calculate_base_value, calculate_overall
 from app.models import Jogador
 from app.repositories import player_repository
-from app.schemas.players_schema import PageMeta, PlayerListQuery, PlayerOut, PlayerPage, PlayerCreate
+from app.schemas.players_schema import ConditionUpdate, PageMeta, PlayerListQuery, PlayerOut, PlayerPage, PlayerCreate, PlayerUpdate
 from app.utils.validators import POSITIONS, fold_text
-from app.core.errors import NotFoundError
+from app.core.errors import BusinessRuleError, NotFoundError
 from app.repositories import club_repository
 from app.services.player_mapper import to_player_out
+from app.core.clock import now
+from app.repositories import escalacao_repository
 
 MIN_AGE, MAX_AGE = 16, 45
 MIN_VALUE, MAX_VALUE = Decimal("0"), Decimal("550")
@@ -86,7 +88,41 @@ def list_players(db: Session, query: PlayerListQuery) -> PlayerPage:
             total_pages=(total_items + query.limit - 1) // query.limit,
         ),
     )
+    
+def update_player(db: Session, player_id: int, data: PlayerUpdate) -> Jogador:
+    player = get_player(db, player_id)
 
+    if player.clube_id is not None and data.position != player.posicao:
+        raise BusinessRuleError("Jogador com clube não pode mudar de posição.")
+    if data.age < player.idade:
+        raise BusinessRuleError("A idade não pode ser menor que a idade atual.")
+
+    player.nome = data.name
+    player.posicao = data.position
+    player.agilidade = data.agility
+    player.idade = data.age
+    db.commit()
+    db.refresh(player)
+    return player
+def change_condition(db: Session, player_id: int, data: ConditionUpdate) -> Jogador:
+    player = get_player(db, player_id)
+    if player.condicao == "DOENTE" and data.condition == "APTO":
+        raise BusinessRuleError("Jogador DOENTE não pode passar direto para APTO.")
+
+    player.condicao = data.condition
+    if data.condition == "DOENTE":
+        escalacao_repository.remove_player(db, player.id)
+    db.commit()
+    db.refresh(player)
+    return player
+
+def delete_player(db: Session, player_id: int) -> None:
+    player = get_player(db, player_id)
+    if player.clube_id is not None:
+        raise BusinessRuleError("Jogador com clube não pode ser excluído.")
+    player.excluido_em = now()
+    db.commit()
+    
 def _sort_key(criteria: tuple[str, ...]):
     def key(item: PlayerOut):
         return (*(_SORT_KEYS[c](item) for c in criteria), fold_text(item.name), item.id)

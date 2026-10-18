@@ -69,6 +69,9 @@ def _parse_sort(value) -> tuple[str, ...]:
         raise ValueError("não repita o mesmo campo na ordenação")
     return criteria
 
+def check_agility_for_age(age: int, agility: int) -> None:
+    if age >= 35 and agility > 85:
+        raise ValueError("agility: com 35 anos ou mais, o máximo é 85")
 
 QueryInt = Annotated[int, BeforeValidator(_parse_query_int), Field(le=2_147_483_647)]
 QueryAge = Annotated[int, BeforeValidator(_parse_query_int), Field(ge=16, le=45)]
