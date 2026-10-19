@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from app.models import Jogador
 
@@ -9,8 +9,11 @@ def add(db: Session, player: Jogador) -> Jogador:
     db.flush()
     return player
 
-def get_active(db: Session, player_id: int) -> Jogador | None:
-    return db.scalar(select(Jogador).where(Jogador.id == player_id, _ACTIVE))
+def get_active(db: Session, player_id: int, lock: bool = False) -> Jogador | None:
+    stmt = select(Jogador).where(Jogador.id == player_id, _ACTIVE)
+    if lock:
+        stmt = stmt.with_for_update()
+    return db.scalar(stmt)
 
 
 def list_active(
@@ -41,3 +44,7 @@ def list_by_club(db: Session, club_id: int) -> list[Jogador]:
 
 def list_in_clubs(db: Session) -> list[Jogador]:
     return list(db.scalars(select(Jogador).where(_ACTIVE, Jogador.clube_id.is_not(None))))
+
+def count_by_club(db: Session, club_id: int) -> int:
+    stmt = select(func.count()).select_from(Jogador).where(_ACTIVE, Jogador.clube_id == club_id)
+    return db.scalar(stmt) or 0

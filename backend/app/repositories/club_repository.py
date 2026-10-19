@@ -5,8 +5,8 @@ from app.models import Clube
 def exists(db: Session, club_id: int) -> bool:
     return db.scalar(select(Clube.id).where(Clube.id == club_id)) is not None
 
-def get(db: Session, club_id: int) -> Clube | None:
-    return db.get(Clube, club_id)
+def get(db: Session, club_id: int, lock: bool = False) -> Clube | None:
+    return db.get(Clube, club_id, with_for_update=lock)
 
 def list_all(db: Session) -> list[Clube]:
     return list(db.scalars(select(Clube)))

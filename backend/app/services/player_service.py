@@ -46,8 +46,8 @@ def create_player(db: Session, data: PlayerCreate) -> Jogador:
     db.refresh(player)
     return player
 
-def get_player(db: Session, player_id: int) -> Jogador:
-    player = player_repository.get_active(db, player_id)
+def get_player(db: Session, player_id: int, lock: bool = False) -> Jogador:
+    player = player_repository.get_active(db, player_id, lock=lock)
     if player is None:
         raise NotFoundError("Jogador não encontrado.")
     return player
