@@ -1,12 +1,24 @@
+from datetime import datetime
 from decimal import Decimal
 import re
 from typing import Annotated
 from pydantic import BeforeValidator, Field, PlainSerializer
 from app.utils.validators import count_words, normalize_text
+from app.utils.location import BRT
 
 _QUERY_INT = re.compile(r"[1-9][0-9]*")
 _QUERY_DECIMAL = re.compile(r"(0|[1-9][0-9]*)(\.[0-9]{1,2})?")
 SORT_OPTIONS = ("name", "value_asc", "value_desc", "age_asc", "age_desc", "position")
+BrtDateTime = Annotated[
+    datetime,
+    PlainSerializer(
+        lambda value: value.astimezone(BRT).isoformat(timespec="seconds"),
+        return_type=str,
+        when_used="json",
+    ),
+]
+
+_ACRONYM = re.compile(r"[A-Z]{3}")
 
 Money = Annotated[Decimal, PlainSerializer(float, return_type=float, when_used="json")]
 
@@ -73,6 +85,27 @@ def check_agility_for_age(age: int, agility: int) -> None:
     if age >= 35 and agility > 85:
         raise ValueError("agility: com 35 anos ou mais, o máximo é 85")
 
+def _validate_club_name(value) -> str:
+    if not isinstance(value, str):
+        raise ValueError("deve ser um texto")
+    name = normalize_text(value)
+    if not 3 <= len(name) <= 60:
+        raise ValueError("deve ter de 3 a 60 caracteres")
+    if any(not (char.isalpha() or char in " .-") for char in name):
+        raise ValueError("só pode conter letras, espaços, hífen e ponto")
+    if not 2 <= count_words(name) <= 5:
+        raise ValueError("deve ter de 2 a 5 palavras")
+    return name
+
+def _validate_acronym(value) -> str:
+    if not isinstance(value, str) or not _ACRONYM.fullmatch(value):
+        raise ValueError("deve ter exatamente 3 letras de A a Z, maiúsculas e sem acento")
+    if len(set(value)) == 1:
+        raise ValueError("as três letras não podem ser todas iguais")
+    return value
+
+ClubName = Annotated[str, BeforeValidator(_validate_club_name)]
+Acronym = Annotated[str, BeforeValidator(_validate_acronym)]
 QueryInt = Annotated[int, BeforeValidator(_parse_query_int), Field(le=2_147_483_647)]
 QueryAge = Annotated[int, BeforeValidator(_parse_query_int), Field(ge=16, le=45)]
 QueryLimit = Annotated[int, BeforeValidator(_parse_query_int), Field(le=50)]

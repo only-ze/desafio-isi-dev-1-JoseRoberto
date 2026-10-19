@@ -35,3 +35,9 @@ def list_active(
     elif free is False:
         stmt = stmt.where(Jogador.clube_id.is_not(None))
     return list(db.scalars(stmt))
+
+def list_by_club(db: Session, club_id: int) -> list[Jogador]:
+    return list(db.scalars(select(Jogador).where(_ACTIVE, Jogador.clube_id == club_id)))
+
+def list_in_clubs(db: Session) -> list[Jogador]:
+    return list(db.scalars(select(Jogador).where(_ACTIVE, Jogador.clube_id.is_not(None))))
