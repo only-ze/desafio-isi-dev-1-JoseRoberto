@@ -123,7 +123,15 @@ def delete_player(db: Session, player_id: int) -> None:
     player.excluido_em = now()
     db.commit()
     
-def _sort_key(criteria: tuple[str, ...]):
+def _sort_key(criteria: tuple[str, ...] | str):
+    if isinstance(criteria, str):
+        criteria = (criteria,)
+
     def key(item: PlayerOut):
-        return (*(_SORT_KEYS[c](item) for c in criteria), fold_text(item.name), item.id)
+        return (
+            *(_SORT_KEYS[c](item) for c in criteria),
+            fold_text(item.name),
+            item.id,
+        )
+
     return key

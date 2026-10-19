@@ -67,7 +67,7 @@ class PlayerListQuery(BaseModel):
     max_age: QueryAge | None = None
     min_value: QueryValue | None = None
     max_value: QueryValue | None = None
-    sort: SortCriteria = "name"
+    sort: str = "name"
     page: QueryInt = 1
     limit: QueryLimit = 10
 

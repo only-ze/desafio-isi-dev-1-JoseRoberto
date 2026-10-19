@@ -42,8 +42,15 @@ def _validate_player_name(value) -> str:
     return name
 
 def _parse_query_int(value):
+    if isinstance(value, int) and not isinstance(value, bool):
+        if value > 0:
+            return value
+
     if not isinstance(value, str) or not _QUERY_INT.fullmatch(value):
-        raise ValueError("deve ser um inteiro positivo, só com dígitos e sem zeros à esquerda")
+        raise ValueError(
+            "deve ser um inteiro positivo, só com dígitos e sem zeros à esquerda"
+        )
+
     return int(value)
 
 def _parse_query_decimal(value):
