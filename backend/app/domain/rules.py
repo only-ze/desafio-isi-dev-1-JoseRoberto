@@ -10,6 +10,16 @@ FEE_RATE = Decimal("0.05")
 MAX_PENALTY = Decimal("10.00")
 SQUAD_LIMIT = 12
 MAX_LOYALTY = timedelta(days=1095)
+FORMATIONS: dict[str, tuple[int, int, int]] = {
+    "3-1": (3, 0, 1),
+    "2-2": (2, 0, 2),
+    "2-1-1": (2, 1, 1),
+    "1-2-1": (1, 2, 1),
+}
+LINEUP_SIZE = 5
+_SECTOR = {
+    "GOL": "goalkeeper", "ZAG": "defense", "LAT": "defense", "MEI": "midfield", "ATA": "attack",
+}
 
 def acronym_matches_name(acronym: str, name: str) -> bool:
     letters = [char for char in fold_text(name) if char.isalpha()]
@@ -55,3 +65,13 @@ def sale_commission(profit: Decimal) -> Decimal:
     first_part = min(profit, Decimal("10.00"))
     second_part = profit - first_part
     return round_money(first_part * Decimal("0.10") + second_part * Decimal("0.20"))
+  
+def fits_formation(formation: str, positions: list[str]) -> bool:
+    defense, midfield, attack = FORMATIONS[formation]
+    sectors = [_SECTOR[position] for position in positions]
+    return (
+        sectors.count("goalkeeper") == 1
+        and sectors.count("defense") == defense
+        and sectors.count("midfield") == midfield
+        and sectors.count("attack") == attack
+    )

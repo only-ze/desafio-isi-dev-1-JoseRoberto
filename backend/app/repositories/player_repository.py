@@ -15,7 +15,6 @@ def get_active(db: Session, player_id: int, lock: bool = False) -> Jogador | Non
         stmt = stmt.with_for_update()
     return db.scalar(stmt)
 
-
 def list_active(
     db: Session,
     *,
@@ -48,3 +47,9 @@ def list_in_clubs(db: Session) -> list[Jogador]:
 def count_by_club(db: Session, club_id: int) -> int:
     stmt = select(func.count()).select_from(Jogador).where(_ACTIVE, Jogador.clube_id == club_id)
     return db.scalar(stmt) or 0
+
+def list_active_by_ids(db: Session, ids: list[int], lock: bool = False) -> list[Jogador]:
+    stmt = select(Jogador).where(_ACTIVE, Jogador.id.in_(ids)).order_by(Jogador.id)
+    if lock:
+        stmt = stmt.with_for_update()
+    return list(db.scalars(stmt))

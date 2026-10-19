@@ -12,7 +12,7 @@ from app.schemas.clubs_schema import (
     ClubCreate, ClubDetailOut, ClubListQuery, ClubOut, ContractOut, SquadPlayerOut,
 )
 from app.services.player_mapper import market_value_of, to_player_out
-from app.utils.validators import POSITIONS, fold_text
+from app.utils.validators import POSITIONS, fold_text, squad_sort_key
 
 def create_club(db: Session, data: ClubCreate) -> ClubOut:
     if club_repository.count(db) >= MAX_CLUBS:
@@ -36,7 +36,10 @@ def get_club(db: Session, club_id: int) -> ClubDetailOut:
     if club is None:
         raise NotFoundError("Clube não encontrado.")
 
-    players = sorted(player_repository.list_by_club(db, club.id), key=_squad_order)
+    players = sorted(
+        player_repository.list_by_club(db, club.id),
+        key=lambda p: squad_sort_key(p.posicao, p.nome, p.id),
+    )
     contracts = contract_repository.active_by_club(db, club.id)
     moment = now()
     summary = _to_club_out(club, players)
@@ -59,9 +62,6 @@ def list_clubs(db: Session, query: ClubListQuery) -> list[ClubOut]:
     clubs = [_to_club_out(club, players_by_club[club.id]) for club in club_repository.list_all(db)]
     clubs.sort(key=_club_sort_key(query.sort))
     return clubs
-
-def _squad_order(player: Jogador):
-    return (POSITIONS.index(player.posicao), fold_text(player.nome), player.id)
 
 def _club_sort_key(sort: str):
     def key(club: ClubOut):

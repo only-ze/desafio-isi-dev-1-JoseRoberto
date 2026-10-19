@@ -24,3 +24,6 @@ def add(db: Session, club: Clube) -> Clube:
     db.add(club)
     db.flush()
     return club
+
+def names_by_id(db: Session) -> dict[int, str]:
+    return {club_id: name for club_id, name in db.execute(select(Clube.id, Clube.nome))}

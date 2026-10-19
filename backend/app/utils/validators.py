@@ -7,7 +7,7 @@ CENT = Decimal("0.01")
 Condition = Literal["APTO", "MAL_CONDICIONADO", "DOENTE"]
 Position = Literal["GOL", "ZAG", "LAT", "MEI", "ATA"]
 POSITIONS: tuple[str, ...] = get_args(Position)
-
+Formation = Literal["3-1", "2-2", "2-1-1", "1-2-1"]
 _MULTIPLE_SPACES = re.compile(" {2,}")
 
 def round_money(value: Decimal) -> Decimal:
@@ -28,3 +28,6 @@ def count_words(text: str) -> int:
 def fold_text(value: str) -> str:
     decomposed = unicodedata.normalize("NFD", value.lower())
     return "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+
+def squad_sort_key(position: str, name: str, player_id: int) -> tuple[int, str, int]:
+    return (POSITIONS.index(position), fold_text(name), player_id)
