@@ -30,3 +30,10 @@ export function formatDateTime(iso: string): string {
 export function toApiDateTime(localValue: string): string {
   return `${localValue.slice(0, 16)}-03:00`;
 }
+
+export function initials(name: string): string {
+  const parts = name.split(" ").filter(Boolean);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
+  return (first + last).toUpperCase();
+}
