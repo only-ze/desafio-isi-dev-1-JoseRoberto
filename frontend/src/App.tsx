@@ -1,7 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-
 import { AppLayout } from "@/components/layout/AppLayout";
-import { PlayersPage } from "@/pages/PlayersPage";
+import { PlayersPage } from "./pages/players/PlayersPage";
 
 export default function App() {
   return (
