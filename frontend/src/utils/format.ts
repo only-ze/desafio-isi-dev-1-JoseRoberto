@@ -31,6 +31,10 @@ export function toApiDateTime(localValue: string): string {
   return `${localValue.slice(0, 16)}-03:00`;
 }
 
+export function normalizeName(raw: string): string {
+  return raw.trim().replace(/ {2,}/g, " ");
+}
+
 export function initials(name: string): string {
   const parts = name.split(" ").filter(Boolean);
   const first = parts[0]?.[0] ?? "";

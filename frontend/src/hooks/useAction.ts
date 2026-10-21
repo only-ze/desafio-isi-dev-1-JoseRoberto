@@ -4,6 +4,7 @@ import { notifyError, notifySuccess } from "@/utils/notify";
 interface ActionOptions<TResult> {
   successMessage?: string | ((result: TResult) => string);
   onSuccess?: (result: TResult) => void;
+  onError?: (error: unknown) => void;
 }
 
 export function useAction<TArgs extends unknown[], TResult>(
@@ -26,7 +27,8 @@ export function useAction<TArgs extends unknown[], TResult>(
       options.onSuccess?.(result);
       return result;
     } catch (error) {
-      notifyError(error);
+      if (options.onError) options.onError(error);
+      else notifyError(error);
       return undefined;
     } finally {
       running.current = false;

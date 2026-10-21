@@ -1,4 +1,4 @@
-import type { Condition, Formation, Position } from "@/utils/labels";
+import type { Condition, Formation, Position, TransactionType } from "@/utils/labels";
 
 export interface Player {
   id: number;
@@ -58,6 +58,11 @@ export interface Club {
   net_worth: number;
 }
 
+export interface ClubCreateInput {
+  name: string;
+  acronym: string;
+}
+
 export interface Contract {
   purchase_value: number;
   loyalty_until: string;
@@ -72,8 +77,6 @@ export interface SquadPlayer extends Player {
 export interface ClubDetail extends Club {
   players: SquadPlayer[];
 }
-
-export type TransactionType = "COMPRA" | "VENDA";
 
 export interface Transaction {
   id: number;
@@ -120,6 +123,11 @@ export interface Lineup {
   formation: Formation | null;
   complete: boolean;
   players: Player[];
+}
+
+export interface LineupInput {
+  formation: Formation;
+  player_ids: number[];
 }
 
 export interface DuelParticipant {

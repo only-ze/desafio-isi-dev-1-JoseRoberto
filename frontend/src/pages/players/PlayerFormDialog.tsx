@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAction } from "@/hooks/useAction";
 import type { Player, PlayerCreateInput, PlayerUpdateInput } from "@/types/api";
-import { formatMoney } from "@/utils/format";
+import { formatMoney, normalizeName } from "@/utils/format";
 import { POSITION_LABEL, POSITIONS, type Position } from "@/utils/labels";
 
 type NumericKey =
@@ -55,10 +55,6 @@ function initialValues(player: Player | null): FormValues {
     age: text(player?.age),
     pace: "", shooting: "", passing: "", dribbling: "", defending: "", physical: "", potential: "",
   };
-}
-
-function normalizeName(raw: string): string {
-  return raw.trim().replace(/ {2,}/g, " ");
 }
 
 function validateName(raw: string): string | undefined {

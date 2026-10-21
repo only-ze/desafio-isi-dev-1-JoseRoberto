@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { buyPlayer } from "@/api/market";
 import { FormField } from "@/components/FormField";
+import { ResultList } from "@/components/ResultList";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,15 +24,6 @@ interface BuyDialogProps {
   clubsError: string | null;
   onClose: () => void;
   onBought: () => void;
-}
-
-function ResultRow({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
-  return (
-    <div className="flex justify-between gap-4 py-1.5 text-sm">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className={strong ? "font-semibold tabular-nums" : "tabular-nums"}>{value}</dd>
-    </div>
-  );
 }
 
 export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyDialogProps) {
@@ -69,13 +61,15 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
             <DialogTitle>Compra realizada</DialogTitle>
             <DialogDescription>{result.player_name} agora faz parte do elenco.</DialogDescription>
           </DialogHeader>
-          <dl className="divide-y">
-            <ResultRow label="Valor" value={formatMoney(result.value)} />
-            <ResultRow label="Taxa" value={formatMoney(result.fee)} />
-            <ResultRow label="Custo total" value={formatMoney(Math.abs(result.cash_change))} strong />
-            <ResultRow label="Fim da fidelidade" value={formatDateTime(result.contract.loyalty_until)} />
-            <ResultRow label="Novo caixa" value={formatMoney(result.club_cash)} strong />
-          </dl>
+          <ResultList
+            items={[
+              { label: "Valor", value: formatMoney(result.value) },
+              { label: "Taxa", value: formatMoney(result.fee) },
+              { label: "Custo total", value: formatMoney(Math.abs(result.cash_change)), strong: true },
+              { label: "Fim da fidelidade", value: formatDateTime(result.contract.loyalty_until) },
+              { label: "Novo caixa", value: formatMoney(result.club_cash), strong: true },
+            ]}
+          />
           <DialogFooter>
             <Button onClick={onClose}>Fechar</Button>
           </DialogFooter>

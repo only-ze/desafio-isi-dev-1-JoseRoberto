@@ -18,5 +18,13 @@ export const CONDITION_LABEL: Record<Condition, string> = {
   DOENTE: "Doente",
 };
 
-export const FORMATIONS = ["3-1", "2-2", "2-1-1", "1-2-1"] as const;
+export const TRANSACTION_TYPES = ["COMPRA", "VENDA"] as const;
+export type TransactionType = (typeof TRANSACTION_TYPES)[number];
+
+export const TRANSACTION_TYPE_LABEL: Record<TransactionType, string> = {
+  COMPRA: "Compra",
+  VENDA: "Venda",
+};
+
+export const FORMATIONS =["3-1", "2-2", "2-1-1", "1-2-1"] as const;
 export type Formation = (typeof FORMATIONS)[number];
