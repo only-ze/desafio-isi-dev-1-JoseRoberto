@@ -1,14 +1,5 @@
-import { errorMessage, isNetworkError } from "@/api/http";
 import { Notice } from "@/components/Notice";
-
-export interface ActionFailure {
-  network: boolean;
-  message: string;
-}
-
-export function toActionFailure(error: unknown): ActionFailure {
-  return { network: isNetworkError(error), message: errorMessage(error) };
-}
+import type { ActionFailure } from "@/utils/failure";
 
 interface ActionFailureNoticeProps {
   failure: ActionFailure | null;

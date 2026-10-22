@@ -75,7 +75,8 @@ export function MatchDetailPage() {
             <div>
               <p className="font-medium">Em campo</p>
               <p className="text-xs text-muted-foreground">
-                Titulares de cada clube na formação da partida e os valores usados nos duelos, já com o efeito da condição.
+                Titulares de cada clube na formação da partida e os valores usados nos duelos, já com o efeito da
+                condição.
               </p>
             </div>
             <PitchLegend />
@@ -89,16 +90,16 @@ export function MatchDetailPage() {
           <div className="p-4">
             <p className="font-medium">Duelos</p>
             <p className="text-xs text-muted-foreground">
-              Os 3 ataques do mandante e depois os 3 do visitante. Os jogadores de linha vão do 1º (o mais recuado) ao 4º
-              (o mais avançado), pela ordem do elenco: o 4º ataca o goleiro, o 3º ataca o 1º e o 2º ataca o 2º.
+              Os 3 ataques do mandante e depois os 3 do visitante. Os jogadores de linha vão do 1º (o mais recuado) ao
+              4º (o mais avançado), pela ordem do elenco: o 4º ataca o goleiro, o 3º ataca o 1º e o 2º ataca o 2º.
             </p>
           </div>
           <DuelsTable match={match} clubsById={clubsById} />
         </Card>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Os valores e a condição de cada titular vêm gravados nos duelos devolvidos pela API; mal condicionado joga com 15%
-        a menos.
+        Os valores e a condição de cada titular vêm gravados nos duelos devolvidos pela API; mal condicionado joga com
+        15% a menos.
       </p>
     </>
   );

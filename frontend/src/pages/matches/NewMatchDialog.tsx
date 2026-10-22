@@ -1,7 +1,7 @@
 import { Info, Shield, Swords } from "lucide-react";
 import { useState } from "react";
 import { playMatch } from "@/api/matches";
-import { ActionFailureNotice, toActionFailure, type ActionFailure } from "@/components/ActionFailureNotice";
+import { ActionFailureNotice } from "@/components/ActionFailureNotice";
 import { FormField } from "@/components/FormField";
 import { Notice } from "@/components/Notice";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -17,6 +17,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAction } from "@/hooks/useAction";
 import type { Club, Match } from "@/types/api";
+import { toActionFailure, type ActionFailure } from "@/utils/failure";
 
 type Field = "home" | "away";
 
@@ -76,7 +77,11 @@ export function NewMatchDialog({ clubs, onClose, onPlayed }: NewMatchDialogProps
   function submit() {
     const found = {
       home: homeId ? undefined : "Escolha o mandante.",
-      away: !awayId ? "Escolha o visitante." : awayId === homeId ? "Escolha um clube diferente do mandante." : undefined,
+      away: !awayId
+        ? "Escolha o visitante."
+        : awayId === homeId
+          ? "Escolha um clube diferente do mandante."
+          : undefined,
     };
     setErrors(found);
     if (found.home || found.away) return;
@@ -89,7 +94,9 @@ export function NewMatchDialog({ clubs, onClose, onPlayed }: NewMatchDialogProps
       <DialogContent className="sm:max-w-130">
         <DialogHeader>
           <DialogTitle>Nova partida</DialogTitle>
-          <DialogDescription>Escolha o mandante e o visitante. O placar sai dos atributos dos titulares, sem sorteio.</DialogDescription>
+          <DialogDescription>
+            Escolha o mandante e o visitante. O placar sai dos atributos dos titulares, sem sorteio.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <ActionFailureNotice failure={failure} refusedTitle="Não foi possível jogar a partida" action="partida" />
@@ -104,7 +111,12 @@ export function NewMatchDialog({ clubs, onClose, onPlayed }: NewMatchDialogProps
               onChange={(value) => choose("home", value)}
             />
           </FormField>
-          <FormField id="away-club" label="Visitante" error={errors.away} hint="Precisa ser um clube diferente do mandante.">
+          <FormField
+            id="away-club"
+            label="Visitante"
+            error={errors.away}
+            hint="Precisa ser um clube diferente do mandante."
+          >
             <ClubSelect
               id="away-club"
               value={awayId}
@@ -124,7 +136,9 @@ export function NewMatchDialog({ clubs, onClose, onPlayed }: NewMatchDialogProps
             </p>
             <p className="mt-2">Os dois clubes precisam ter os 5 titulares escalados. A partida não mexe no caixa.</p>
           </Notice>
-          {play.pending && <Notice tone="info">Jogando a partida. Os botões ficam desabilitados até a resposta.</Notice>}
+          {play.pending && (
+            <Notice tone="info">Jogando a partida. Os botões ficam desabilitados até a resposta.</Notice>
+          )}
         </div>
         <DialogFooter className="border-t pt-4">
           <Button variant="outline" disabled={play.pending} onClick={onClose}>

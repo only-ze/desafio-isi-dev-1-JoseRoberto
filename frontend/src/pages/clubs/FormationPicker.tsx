@@ -11,7 +11,12 @@ interface FormationPickerProps {
 
 export function FormationPicker({ value, invalid, onChange }: FormationPickerProps) {
   return (
-    <div role="radiogroup" aria-label="Formação" aria-invalid={invalid} className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+    <div
+      role="radiogroup"
+      aria-label="Formação"
+      aria-invalid={invalid}
+      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4"
+    >
       {FORMATIONS.map((formation) => {
         const selected = formation === value;
         return (

@@ -44,7 +44,9 @@ export function PenaltyRateBadge({ rate }: { rate: number }) {
   return (
     <Badge
       variant="outline"
-      className={rate > 0 ? "border-amber-200 bg-amber-50 text-amber-800" : "border-green-200 bg-green-50 text-green-700"}
+      className={
+        rate > 0 ? "border-amber-200 bg-amber-50 text-amber-800" : "border-green-200 bg-green-50 text-green-700"
+      }
     >
       {rate}%
     </Badge>

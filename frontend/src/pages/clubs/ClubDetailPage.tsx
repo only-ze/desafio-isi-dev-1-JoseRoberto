@@ -132,8 +132,8 @@ export function ClubDetailPage() {
             </DataState>
           </Card>
           <p className="mt-3 text-xs text-muted-foreground">
-            Dias restantes e % de multa valem se o jogador fosse vendido agora. Vendido, ele volta a ficar livre e sai da
-            escalação.
+            Dias restantes e % de multa valem se o jogador fosse vendido agora. Vendido, ele volta a ficar livre e sai
+            da escalação.
           </p>
         </TabsContent>
 

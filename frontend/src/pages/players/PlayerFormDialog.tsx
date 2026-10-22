@@ -18,8 +18,7 @@ import { formatMoney, normalizeName } from "@/utils/format";
 import { POSITION_LABEL, POSITIONS, type Position } from "@/utils/labels";
 
 type NumericKey =
-  | "agility" | "age"
-  | "pace" | "shooting" | "passing" | "dribbling" | "defending" | "physical" | "potential";
+  "agility" | "age" | "pace" | "shooting" | "passing" | "dribbling" | "defending" | "physical" | "potential";
 type FieldKey = "name" | "position" | NumericKey;
 type FormValues = Record<FieldKey, string>;
 type FormErrors = Partial<Record<FieldKey, string>>;
@@ -53,7 +52,13 @@ function initialValues(player: Player | null): FormValues {
     position: player?.position ?? "",
     agility: text(player?.agility),
     age: text(player?.age),
-    pace: "", shooting: "", passing: "", dribbling: "", defending: "", physical: "", potential: "",
+    pace: "",
+    shooting: "",
+    passing: "",
+    dribbling: "",
+    defending: "",
+    physical: "",
+    potential: "",
   };
 }
 

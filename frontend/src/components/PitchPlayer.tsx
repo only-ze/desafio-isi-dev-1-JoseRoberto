@@ -1,12 +1,6 @@
 import { Thermometer, Volleyball } from "lucide-react";
-import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { initials } from "@/utils/format";
-
-export const GRASS_STYLE: CSSProperties = {
-  backgroundColor: "#1f5f32",
-  backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 10%, transparent 10% 20%)",
-};
 
 interface PitchPlayerProps {
   name: string;
@@ -23,7 +17,9 @@ export function PitchPlayer({ name, label, caption, tone = "home", unfit = false
       <div
         className={cn(
           "relative flex size-9 items-center justify-center rounded-full border-2 text-xs font-semibold shadow",
-          tone === "home" ? "border-white bg-primary text-primary-foreground" : "border-slate-300 bg-white text-slate-800",
+          tone === "home"
+            ? "border-white bg-primary text-primary-foreground"
+            : "border-slate-300 bg-white text-slate-800",
         )}
       >
         {initials(name)}

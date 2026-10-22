@@ -1,7 +1,7 @@
 import { HandCoins, Info } from "lucide-react";
 import { useState } from "react";
 import { sellPlayer } from "@/api/market";
-import { ActionFailureNotice, toActionFailure, type ActionFailure } from "@/components/ActionFailureNotice";
+import { ActionFailureNotice } from "@/components/ActionFailureNotice";
 import { ContractStatusBadge, PenaltyRateBadge } from "@/components/badges";
 import { Notice } from "@/components/Notice";
 import { PlayerSummary } from "@/components/PlayerSummary";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAction } from "@/hooks/useAction";
 import type { SellResult, SquadPlayer } from "@/types/api";
+import { toActionFailure, type ActionFailure } from "@/utils/failure";
 import { formatDateTime, formatMoney, formatSignedMoney } from "@/utils/format";
 
 interface SellDialogProps {
@@ -28,7 +29,15 @@ interface SellDialogProps {
   onSold: () => void;
 }
 
-function SellResultDialog({ result, clubName, onClose }: { result: SellResult; clubName: string; onClose: () => void }) {
+function SellResultDialog({
+  result,
+  clubName,
+  onClose,
+}: {
+  result: SellResult;
+  clubName: string;
+  onClose: () => void;
+}) {
   const fulfilled = result.penalty_rate === 0;
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>

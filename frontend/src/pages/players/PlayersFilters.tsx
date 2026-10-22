@@ -137,13 +137,7 @@ function RangeFilter({ label, kind, min, max, onApply }: RangeFilterProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-64">
-        <RangeForm
-          kind={kind}
-          initialMin={min}
-          initialMax={max}
-          onApply={finish}
-          onClear={() => finish("", "")}
-        />
+        <RangeForm kind={kind} initialMin={min} initialMax={max} onApply={finish} onClear={() => finish("", "")} />
       </PopoverContent>
     </Popover>
   );

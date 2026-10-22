@@ -32,12 +32,20 @@ function byOrder(a: Duel, b: Duel): number {
 
 function attackEntry(duel: Duel): PitchEntry {
   const { attacker } = duel;
-  return { participant: attacker, attributes: [{ attribute: attacker.attribute, value: attacker.value }], scored: duel.goal };
+  return {
+    participant: attacker,
+    attributes: [{ attribute: attacker.attribute, value: attacker.value }],
+    scored: duel.goal,
+  };
 }
 
 function defenseEntry(duel: Duel): PitchEntry {
   const { defender } = duel;
-  return { participant: defender, attributes: [{ attribute: defender.attribute, value: defender.value }], scored: false };
+  return {
+    participant: defender,
+    attributes: [{ attribute: defender.attribute, value: defender.value }],
+    scored: false,
+  };
 }
 
 export function teamDuels(match: Match, clubId: number): { attacks: Duel[]; defenses: Duel[] } {

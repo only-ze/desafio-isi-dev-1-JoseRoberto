@@ -235,7 +235,9 @@ export function LineupEditor({ clubId, clubName, squad, lineup, onSaved }: Lineu
                             aria-invalid={Boolean(error)}
                           >
                             <SelectValue
-                              placeholder={candidates.length ? "Escolha o titular" : `Sem ${slot.positionsLabel} no elenco`}
+                              placeholder={
+                                candidates.length ? "Escolha o titular" : `Sem ${slot.positionsLabel} no elenco`
+                              }
                             />
                           </SelectTrigger>
                           <SelectContent>

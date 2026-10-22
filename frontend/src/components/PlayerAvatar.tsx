@@ -14,7 +14,9 @@ const PALETTE = [
 export function PlayerAvatar({ id, name }: { id: number; name: string }) {
   return (
     <Avatar className="size-8">
-      <AvatarFallback className={cn("text-xs font-medium", PALETTE[id % PALETTE.length])}>{initials(name)}</AvatarFallback>
+      <AvatarFallback className={cn("text-xs font-medium", PALETTE[id % PALETTE.length])}>
+        {initials(name)}
+      </AvatarFallback>
     </Avatar>
   );
 }

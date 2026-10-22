@@ -25,8 +25,7 @@ export function ConditionDialog({ player, onClose, onSaved }: ConditionDialogPro
   const [condition, setCondition] = useState<Condition>(player.condition);
 
   const save = useAction(() => changeCondition(player.id, condition), {
-    successMessage: (updated) =>
-      `Condição atualizada. Novo valor de mercado: ${formatMoney(updated.market_value)}.`,
+    successMessage: (updated) => `Condição atualizada. Novo valor de mercado: ${formatMoney(updated.market_value)}.`,
     onSuccess: () => {
       onSaved();
       onClose();
@@ -55,7 +54,9 @@ export function ConditionDialog({ player, onClose, onSaved }: ConditionDialogPro
           </SelectContent>
         </Select>
         {player.condition === "DOENTE" && (
-          <p className="text-xs text-muted-foreground">De Doente não vai direto para Apto: passe por Mal condicionado.</p>
+          <p className="text-xs text-muted-foreground">
+            De Doente não vai direto para Apto: passe por Mal condicionado.
+          </p>
         )}
         {condition === "DOENTE" && player.club_id !== null && (
           <p className="text-xs text-muted-foreground">Se for titular, o jogador sai da escalação do clube.</p>

@@ -116,7 +116,7 @@ export function MatchesPage() {
       <p className="mt-3 text-xs text-muted-foreground">
         {noMatches
           ? "Nenhuma partida jogada ainda. A classificação continua com todos os clubes, zerados."
-          : "Partidas da mais recente para a mais antiga, com filtro por clube. \"Ver duelos\" abre a partida."}
+          : 'Partidas da mais recente para a mais antiga, com filtro por clube. "Ver duelos" abre a partida.'}
       </p>
 
       {creating && (

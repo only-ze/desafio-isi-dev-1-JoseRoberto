@@ -1,7 +1,8 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { GRASS_STYLE, PitchPlayer } from "@/components/PitchPlayer";
+import { PitchPlayer } from "@/components/PitchPlayer";
 import { cn } from "@/lib/utils";
 import { sectorRows } from "@/utils/formations";
+import { GRASS_STYLE } from "@/utils/pitch";
 import { ATTRIBUTE_SHORT_LABEL } from "@/utils/labels";
 import type { PitchEntry, TeamOnPitch, TeamSide } from "./matchTeams";
 

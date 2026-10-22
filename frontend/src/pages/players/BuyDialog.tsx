@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { buyPlayer } from "@/api/market";
-import { ActionFailureNotice, toActionFailure, type ActionFailure } from "@/components/ActionFailureNotice";
+import { ActionFailureNotice } from "@/components/ActionFailureNotice";
 import { ContractStatusBadge } from "@/components/badges";
 import { FormField } from "@/components/FormField";
 import { Notice } from "@/components/Notice";
@@ -25,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAction } from "@/hooks/useAction";
 import type { BuyResult, Club, Player } from "@/types/api";
 import { formatDateTime, formatMoney, toApiDateTime } from "@/utils/format";
+import { toActionFailure, type ActionFailure } from "@/utils/failure";
 
 interface BuyDialogProps {
   player: Player;
@@ -34,7 +35,15 @@ interface BuyDialogProps {
   onBought: () => void;
 }
 
-function BuyResultDialog({ result, club, onClose }: { result: BuyResult; club: Club | undefined; onClose: () => void }) {
+function BuyResultDialog({
+  result,
+  club,
+  onClose,
+}: {
+  result: BuyResult;
+  club: Club | undefined;
+  onClose: () => void;
+}) {
   const clubName = club?.name ?? "clube";
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -109,7 +118,11 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
   function submit() {
     const found = {
       club: clubId ? undefined : "Escolha o clube comprador.",
-      loyalty: !date ? "Informe a data do fim da fidelidade." : !time ? "Informe a hora do fim da fidelidade." : undefined,
+      loyalty: !date
+        ? "Informe a data do fim da fidelidade."
+        : !time
+          ? "Informe a hora do fim da fidelidade."
+          : undefined,
     };
     setErrors(found);
     if (found.club || found.loyalty) return;
@@ -118,7 +131,9 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
   }
 
   if (result) {
-    return <BuyResultDialog result={result} club={clubs.find((club) => club.id === result.club_id)} onClose={onClose} />;
+    return (
+      <BuyResultDialog result={result} club={clubs.find((club) => club.id === result.club_id)} onClose={onClose} />
+    );
   }
 
   return (

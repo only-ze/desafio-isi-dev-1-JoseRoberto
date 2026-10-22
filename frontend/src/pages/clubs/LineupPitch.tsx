@@ -1,7 +1,8 @@
 import { Plus } from "lucide-react";
-import { GRASS_STYLE, PitchPlayer } from "@/components/PitchPlayer";
+import { PitchPlayer } from "@/components/PitchPlayer";
 import type { Player } from "@/types/api";
 import { sectorRows } from "@/utils/formations";
+import { GRASS_STYLE } from "@/utils/pitch";
 import type { Formation } from "@/utils/labels";
 import type { LineupSlot } from "./lineupSlots";
 
@@ -71,11 +72,7 @@ function Marker({ slot, player }: PitchMarker) {
     );
   }
   return (
-    <PitchPlayer
-      name={player.name}
-      label={surname(player.name)}
-      unfit={player.condition === "MAL_CONDICIONADO"}
-    />
+    <PitchPlayer name={player.name} label={surname(player.name)} unfit={player.condition === "MAL_CONDICIONADO"} />
   );
 }
 

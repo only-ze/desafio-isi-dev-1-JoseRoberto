@@ -53,14 +53,18 @@ export function TransactionsTable({ transactions }: { transactions: Transaction[
                 </div>
               </TableCell>
               <TableCell className="text-right tabular-nums">{formatMoney(transaction.value)}</TableCell>
-              <TableCell className="text-right text-muted-foreground tabular-nums">{formatMoney(transaction.fee)}</TableCell>
+              <TableCell className="text-right text-muted-foreground tabular-nums">
+                {formatMoney(transaction.fee)}
+              </TableCell>
               <TableCell className="text-right text-muted-foreground tabular-nums">
                 {formatMoney(transaction.penalty)}
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 <ProfitCell profit={transaction.profit} />
               </TableCell>
-              <TableCell className={cn("pr-4 text-right font-semibold tabular-nums", signedClass(transaction.cash_change))}>
+              <TableCell
+                className={cn("pr-4 text-right font-semibold tabular-nums", signedClass(transaction.cash_change))}
+              >
                 {formatSignedMoney(transaction.cash_change)}
               </TableCell>
             </TableRow>

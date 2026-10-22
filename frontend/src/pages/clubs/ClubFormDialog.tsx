@@ -45,7 +45,8 @@ export function ClubFormDialog({ onClose, onSaved }: ClubFormDialogProps) {
   const [refusal, setRefusal] = useState<string | null>(null);
 
   const save = useAction(createClub, {
-    successMessage: (club) => `Clube criado. ${club.name} (${club.acronym}) começa com ${formatMoney(club.cash)} em caixa.`,
+    successMessage: (club) =>
+      `Clube criado. ${club.name} (${club.acronym}) começa com ${formatMoney(club.cash)} em caixa.`,
     onSuccess: () => {
       onSaved();
       onClose();

@@ -37,7 +37,11 @@ function chipsFor(filters: PlayerFilters, clubs: Club[]): Chip[] {
     chips.push({ key: "club", label: `Clube: ${club?.name ?? filters.clubId}`, clear: { clubId: "" } });
   }
   if (filters.minAge || filters.maxAge) {
-    chips.push({ key: "age", label: `Idade: ${rangeText(filters.minAge, filters.maxAge)}`, clear: { minAge: "", maxAge: "" } });
+    chips.push({
+      key: "age",
+      label: `Idade: ${rangeText(filters.minAge, filters.maxAge)}`,
+      clear: { minAge: "", maxAge: "" },
+    });
   }
   if (filters.minValue || filters.maxValue) {
     chips.push({
@@ -64,7 +68,10 @@ export function ActiveFilters({ filters, clubs, onRemove, onClear }: ActiveFilte
     <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
       {chips.length > 0 && <span className="text-muted-foreground">Filtros ativos:</span>}
       {chips.map((chip) => (
-        <span key={chip.key} className="inline-flex items-center gap-1 rounded-md border bg-card py-0.5 pr-1 pl-2 text-xs">
+        <span
+          key={chip.key}
+          className="inline-flex items-center gap-1 rounded-md border bg-card py-0.5 pr-1 pl-2 text-xs"
+        >
           {chip.label}
           <button
             type="button"

@@ -91,7 +91,9 @@ export function PlayersTable({ players, clubsById, onBuy, onEdit, onChangeCondit
               <TableCell className="text-right text-muted-foreground tabular-nums">
                 {formatMoney(player.base_value)}
               </TableCell>
-              <TableCell className="text-right font-semibold tabular-nums">{formatMoney(player.market_value)}</TableCell>
+              <TableCell className="text-right font-semibold tabular-nums">
+                {formatMoney(player.market_value)}
+              </TableCell>
               <TableCell>
                 <ClubCell player={player} clubsById={clubsById} />
               </TableCell>

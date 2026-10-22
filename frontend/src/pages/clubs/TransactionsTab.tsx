@@ -156,7 +156,10 @@ function TransactionsToolbar({
         {TRANSACTION_TYPES.map((type) => (
           <TypeCheckbox key={type} type={type} checked={types.includes(type)} onToggle={() => onToggleType(type)} />
         ))}
-        <Select value={playerId || ALL_PLAYERS} onValueChange={(next) => onPlayerChange(next === ALL_PLAYERS ? "" : next)}>
+        <Select
+          value={playerId || ALL_PLAYERS}
+          onValueChange={(next) => onPlayerChange(next === ALL_PLAYERS ? "" : next)}
+        >
           <SelectTrigger size="sm" className="w-auto min-w-44" aria-label="Jogador">
             <User className="text-muted-foreground" />
             <SelectValue>Jogador: {selectedPlayer?.name ?? "todos"}</SelectValue>

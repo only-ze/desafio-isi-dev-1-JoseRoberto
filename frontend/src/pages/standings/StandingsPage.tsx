@@ -163,7 +163,7 @@ export function StandingsPage() {
         }
       />
 
-      <div className="grid items-start gap-4 lg:grid-cols-[1fr_300px]">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_300px]">
         <div>
           <Card className="gap-0 overflow-hidden py-0">
             <DataState
@@ -180,15 +180,15 @@ export function StandingsPage() {
               <div className={cn("transition-opacity", standings.refreshing && "opacity-60")}>
                 <StandingsTable standings={rows} clubsById={clubsById} />
                 <p className="border-t px-4 py-3 text-xs text-muted-foreground">
-                  J: jogos · V: vitórias · E: empates · D: derrotas · GP: gols marcados · GC: gols sofridos · SG: saldo de
-                  gols · Pts: pontos
+                  J: jogos · V: vitórias · E: empates · D: derrotas · GP: gols marcados · GC: gols sofridos · SG: saldo
+                  de gols · Pts: pontos
                 </p>
               </div>
             </DataState>
           </Card>
           <p className="mt-3 text-xs text-muted-foreground">
-            Na ordem devolvida pela API, com os clubes sem partidas zerados. Pontos, saldo e posição são calculados a cada
-            consulta.
+            Na ordem devolvida pela API, com os clubes sem partidas zerados. Pontos, saldo e posição são calculados a
+            cada consulta.
           </p>
         </div>
         <div className="space-y-4">

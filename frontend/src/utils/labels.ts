@@ -52,5 +52,5 @@ export const MATCH_RESULT_LABEL: Record<MatchResult, string> = {
   EMPATE: "Empate",
 };
 
-export const FORMATIONS =["3-1", "2-2", "2-1-1", "1-2-1"] as const;
+export const FORMATIONS = ["3-1", "2-2", "2-1-1", "1-2-1"] as const;
 export type Formation = (typeof FORMATIONS)[number];

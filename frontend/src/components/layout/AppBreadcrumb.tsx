@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { NAV_GROUPS } from "./navigation";
 
-
 function trailFor(pathname: string): string[] {
   for (const group of NAV_GROUPS) {
     const item = group.items.find(({ to }) => pathname.startsWith(to));

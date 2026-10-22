@@ -49,7 +49,9 @@ export function SquadTable({ players, onSell }: SquadTableProps) {
               <ConditionBadge condition={player.condition} />
             </TableCell>
             <TableCell className="text-right font-semibold tabular-nums">{formatMoney(player.market_value)}</TableCell>
-            <TableCell className="whitespace-nowrap tabular-nums">{formatDateTime(player.contract.loyalty_until)}</TableCell>
+            <TableCell className="whitespace-nowrap tabular-nums">
+              {formatDateTime(player.contract.loyalty_until)}
+            </TableCell>
             <TableCell className="text-right tabular-nums">{player.contract.remaining_days}</TableCell>
             <TableCell className="text-right tabular-nums">{player.contract.penalty_rate}%</TableCell>
             <TableCell>
