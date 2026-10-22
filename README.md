@@ -280,22 +280,20 @@ Nenhuma das funcionalidades obrigatórias ficou de fora, e todos os diferenciais
 
 **Onde:**
 
-- **Frontend, desenvolvimento e prototipação das telas** a partir do mockup: telas de Clubes (lista, criação, página do clube, elenco, escalação com o campo e histórico de transações com filtros, totais e exportação), diálogos de compra e venda, telas da Liga (partidas, detalhe da partida com os duelos e classificação) e os estados de carregamento, lista vazia e erro. Também os componentes compartilhados criados para essas telas (`DataState`, `Notice`, `ResultList`, `SubmitButton`, `PlayerAvatar`, `PitchPlayer` e outros) e as funções de acesso à API correspondentes.
-- **Diferenciais técnicos:** configuração dos testes (pytest no backend, Vitest com Testing Library no frontend) e escrita dos casos, configuração do lint e da formatação (Ruff e Prettier) e os Dockerfiles e o Docker Compose da aplicação inteira.
-- **Revisão final** do backend e do frontend contra o enunciado e o barema, e redação deste README.
+- **Protótipo das telas** do frontend a partir do mockup do Figma.
+- **Testes do backend** (pytest).
+- **Revisão final** do backend e do frontend contra o enunciado e o barema.
 
 **Como e por quê:**
 
-- O MCP do Figma foi usado para ler cada seção do mockup e prototipar as telas seguindo a disposição e os textos dele, o que acelerou a parte visual.
-- O trabalho foi feito em etapas (clubes, compra, venda, histórico, liga e estados). Cada etapa foi revisada, testada no navegador contra a API e commitada separadamente.
-- Na revisão final, um script de verificação percorreu os itens do roteiro da API (B01 a B22) em um banco separado e apontou três falhas, que foram corrigidas: a ordenação de jogadores com `sort` diferente do padrão respondia 500; o histórico e a exportação respondiam 200, em vez de 404, para clube inexistente; e o filtro `player_id` respondia 200, em vez de 404, para jogador inexistente ou excluído. A revisão também removeu código e arquivos sem uso, padronizou nomes de módulos em inglês e estendeu o lint do frontend a todo o código.
-- Os casos de teste do backend partem dos exemplos numéricos do enunciado, e cada valor esperado foi conferido contra o texto. O Docker Compose foi testado subindo uma cópia isolada da aplicação (outro nome de projeto e outras portas), com a interface consumindo a API do contêiner. A conferência de responsividade com 375 px apontou rolagem horizontal na classificação, corrigida.
+- O MCP do Figma foi usado para ler as seções do mockup e prototipar as telas seguindo a disposição e os textos dele, o que acelerou a parte visual.
+- Os casos de teste do backend partem dos exemplos numéricos do enunciado, e cada valor esperado foi conferido contra o texto.
+- Na revisão final, um script de verificação percorreu os itens do roteiro da API (B01 a B22) em um banco separado e apontou três falhas, que foram corrigidas: a ordenação de jogadores com `sort` diferente do padrão respondia 500; o histórico e a exportação respondiam 200, em vez de 404, para clube inexistente; e o filtro `player_id` respondia 200, em vez de 404, para jogador inexistente ou excluído.
 
 **O que foi aceito, alterado ou descartado:**
 
-- Aceitei a estrutura de componentes e da camada de API sugerida, que segue o padrão já usado na tela de jogadores.
-- Pedi ajustes quando a tela gerada ficou diferente do mockup: diálogo de novo clube, aba de escalação (cartões de formação com o mini campo e a prévia em campo) e largura dos diálogos de compra.
-- Todas as telas foram conferidas no navegador antes de cada commit.
+- Usei o protótipo como base e ajustei as telas que ficaram diferentes do mockup, conferindo cada uma no navegador contra a API.
+- Aceitei as correções apontadas pela revisão depois de reproduzir cada falha.
 
 ---
 
