@@ -17,6 +17,7 @@ import type { Player } from "@/types/api";
 import { BuyDialog } from "./BuyDialog";
 import { ConditionDialog } from "./ConditionDialog";
 import { PlayerFormDialog } from "./PlayerFormDialog";
+import { ActiveFilters } from "./ActiveFilters";
 import { PlayersFilters } from "./PlayersFilters";
 import { PlayersTable } from "./PlayersTable";
 import { INITIAL_FILTERS, SORT_OPTIONS, toQuery, type FreeTab, type PlayerFilters } from "./PlayerFilters";
@@ -58,12 +59,17 @@ export function PlayersPage() {
     setResetKey((key) => key + 1);
   }
 
+  function removeFilter(patch: Partial<PlayerFilters>) {
+    updateFilters(patch);
+    if ("search" in patch) setResetKey((key) => key + 1);
+  }
+
   const remove = useAction((id: number) => deletePlayer(id), {
     successMessage: "Jogador excluído.",
     onSuccess: () => {
       setDeleteTarget(null);
       if (rows.length === 1 && filters.page > 1) {
-        setFilters((current) => ({ ...current, page: current.page - 1 })); // a busca refaz sozinha
+        setFilters((current) => ({ ...current, page: current.page - 1 }));
       } else {
         players.reload();
       }
@@ -89,15 +95,21 @@ export function PlayersPage() {
         resetKey={resetKey}
         onSearch={handleSearch}
         onChange={updateFilters}
-        onClear={clearFilters}
       />
+      <ActiveFilters filters={filters} clubs={clubList} onRemove={removeFilter} onClear={clearFilters} />
 
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <Tabs value={filters.tab} onValueChange={(tab) => handleTab(tab as FreeTab)}>
             <TabsList>
               <TabsTrigger value="all">Todos</TabsTrigger>
-              <TabsTrigger value="free">Livres</TabsTrigger>
+              <TabsTrigger
+                value="free"
+                disabled={filters.clubId !== ""}
+                title={filters.clubId ? "Com um clube filtrado não há jogadores livres" : undefined}
+              >
+                Livres
+              </TabsTrigger>
               <TabsTrigger value="club">Em clubes</TabsTrigger>
             </TabsList>
           </Tabs>

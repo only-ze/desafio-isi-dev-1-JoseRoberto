@@ -27,8 +27,8 @@ export function formatDateTime(iso: string): string {
   return dateTimeFormatter.format(new Date(iso)).replace(", ", " ");
 }
 
-export function toApiDateTime(localValue: string): string {
-  return `${localValue.slice(0, 16)}-03:00`;
+export function toApiDateTime(date: string, time: string): string {
+  return `${date}T${time}-03:00`;
 }
 
 export function normalizeName(raw: string): string {

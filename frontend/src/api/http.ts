@@ -23,6 +23,10 @@ export function errorMessage(error: unknown): string {
   return error instanceof ApiError ? error.message : "Ocorreu um erro inesperado.";
 }
 
+export function isNetworkError(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 0;
+}
+
 function buildUrl(path: string, query?: QueryParams): string {
   const url = new URL(`${API_URL}${path}`, window.location.origin);
   for (const [key, value] of Object.entries(query ?? {})) {

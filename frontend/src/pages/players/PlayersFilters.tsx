@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Club } from "@/types/api";
 import { CONDITION_LABEL, CONDITIONS, POSITION_LABEL, POSITIONS } from "@/utils/labels";
 
-import { hasActiveFilters, type PlayerFilters } from "./PlayerFilters";
+import type { PlayerFilters } from "./PlayerFilters";
 
 const ALL = "__all__";
 
@@ -155,13 +155,12 @@ interface PlayersFiltersProps {
   resetKey: number;
   onSearch: (text: string) => void;
   onChange: (patch: Partial<PlayerFilters>) => void;
-  onClear: () => void;
 }
 
 const POSITION_OPTIONS = POSITIONS.map((value) => ({ value, label: POSITION_LABEL[value] }));
 const CONDITION_OPTIONS = CONDITIONS.map((value) => ({ value, label: CONDITION_LABEL[value] }));
 
-export function PlayersFilters({ filters, clubs, resetKey, onSearch, onChange, onClear }: PlayersFiltersProps) {
+export function PlayersFilters({ filters, clubs, resetKey, onSearch, onChange }: PlayersFiltersProps) {
   const clubOptions = clubs.map((club) => ({ value: String(club.id), label: club.name }));
   const onlyFree = filters.tab === "free";
 
@@ -205,11 +204,6 @@ export function PlayersFilters({ filters, clubs, resetKey, onSearch, onChange, o
         max={filters.maxValue}
         onApply={(minValue, maxValue) => onChange({ minValue, maxValue })}
       />
-      {hasActiveFilters(filters) && (
-        <Button variant="ghost" onClick={onClear}>
-          Limpar filtros
-        </Button>
-      )}
     </div>
   );
 }
