@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, SearchX, ShoppingCart, Users } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getClub } from "@/api/clubs";
@@ -62,9 +62,27 @@ export function ClubDetailPage() {
   );
 
   if (!detail) {
+    const notFound = club.errorStatus === 404;
     return (
       <Card className="py-0">
-        <DataState loading={club.loading} error={club.error} empty={false} onRetry={club.reload}>
+        <DataState
+          loading={club.loading}
+          error={notFound ? `${club.error} O endereço pode estar errado ou o clube não existe.` : club.error}
+          empty={false}
+          loadingLabel="Carregando clube..."
+          errorTitle={notFound ? "Clube não encontrado" : "Não foi possível carregar o clube"}
+          errorIcon={notFound ? SearchX : undefined}
+          errorAction={
+            notFound ? (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/clubs">
+                  <ArrowLeft /> Voltar para clubes
+                </Link>
+              </Button>
+            ) : undefined
+          }
+          onRetry={club.reload}
+        >
           {null}
         </DataState>
       </Card>
@@ -97,7 +115,17 @@ export function ClubDetailPage() {
               loading={false}
               error={club.error}
               empty={detail.players.length === 0}
-              emptyMessage="O elenco está vazio. Compre jogadores livres na tela de Jogadores."
+              errorTitle="Não foi possível carregar o elenco"
+              emptyIcon={Users}
+              emptyTitle="O clube ainda não tem jogadores"
+              emptyMessage="Compre jogadores livres para formar o elenco."
+              emptyAction={
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/players">
+                    <ShoppingCart /> Comprar jogadores
+                  </Link>
+                </Button>
+              }
               onRetry={club.reload}
             >
               <SquadTable players={detail.players} onSell={setSellTarget} />

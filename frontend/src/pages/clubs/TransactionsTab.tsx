@@ -113,6 +113,73 @@ function SummaryBar({ summary }: { summary: TransactionSummary }) {
   );
 }
 
+interface TransactionsToolbarProps {
+  types: TransactionType[];
+  players: PlayerOption[];
+  playerId: string;
+  selectedPlayer: PlayerOption | undefined;
+  filtersActive: boolean;
+  exporting: boolean;
+  onToggleType: (type: TransactionType) => void;
+  onPlayerChange: (playerId: string) => void;
+  onClear: () => void;
+  onExport: () => void;
+}
+
+function TransactionsToolbar({
+  types,
+  players,
+  playerId,
+  selectedPlayer,
+  filtersActive,
+  exporting,
+  onToggleType,
+  onPlayerChange,
+  onClear,
+  onExport,
+}: TransactionsToolbarProps) {
+  return (
+    <>
+      <div className="flex flex-wrap items-start justify-between gap-3 p-4">
+        <div>
+          <p className="font-medium">Histórico de transações</p>
+          <p className="text-xs text-muted-foreground">
+            Da mais recente para a mais antiga, com o nome e os valores do momento de cada operação.
+          </p>
+        </div>
+        <Button variant="outline" disabled={exporting} onClick={onExport}>
+          <Download /> {exporting ? "Exportando..." : "Exportar CSV"}
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 border-b px-4 pb-4">
+        <span className="text-sm text-muted-foreground">Tipo</span>
+        {TRANSACTION_TYPES.map((type) => (
+          <TypeCheckbox key={type} type={type} checked={types.includes(type)} onToggle={() => onToggleType(type)} />
+        ))}
+        <Select value={playerId || ALL_PLAYERS} onValueChange={(next) => onPlayerChange(next === ALL_PLAYERS ? "" : next)}>
+          <SelectTrigger size="sm" className="w-auto min-w-44" aria-label="Jogador">
+            <User className="text-muted-foreground" />
+            <SelectValue>Jogador: {selectedPlayer?.name ?? "todos"}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_PLAYERS}>Todos os jogadores</SelectItem>
+            {players.map((player) => (
+              <SelectItem key={player.id} value={player.id}>
+                {player.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {filtersActive && (
+          <Button variant="link" size="sm" className="h-auto px-1" onClick={onClear}>
+            Limpar filtros
+          </Button>
+        )}
+      </div>
+    </>
+  );
+}
+
 function describeFilters(types: TransactionType[], player: PlayerOption | undefined): string {
   const parts = [
     ...(types.length === 1 ? [TRANSACTION_TYPE_LABEL[types[0]]] : []),
@@ -120,6 +187,10 @@ function describeFilters(types: TransactionType[], player: PlayerOption | undefi
   ];
   if (parts.length === 0) return "sem filtros";
   return parts.length === 1 ? `com o filtro ${parts[0]} aplicado` : `com os filtros ${parts.join(" e ")} aplicados`;
+}
+
+function isRefusal(status: number | null): boolean {
+  return status !== null && status >= 400 && status < 500;
 }
 
 export function TransactionsTab({ club }: { club: ClubDetail }) {
@@ -145,6 +216,8 @@ export function TransactionsTab({ club }: { club: ClubDetail }) {
   const rows = history.data?.data ?? [];
   const players = useMemo(() => playerOptions(allHistory.data?.data ?? []), [allHistory.data]);
   const selectedPlayer = players.find((player) => player.id === playerId);
+  const filterRefused = filtersActive && isRefusal(history.errorStatus);
+  const loadFailed = history.error !== null && !filterRefused;
   const filename = `historico-clube-${club.id}.csv`;
 
   const download = useAction(async () => saveBlob(await exportTransactions(club.id, query), filename), {
@@ -166,47 +239,31 @@ export function TransactionsTab({ club }: { club: ClubDetail }) {
   return (
     <>
       <Card className="gap-0 overflow-hidden py-0">
-        <div className="flex flex-wrap items-start justify-between gap-3 p-4">
-          <div>
-            <p className="font-medium">Histórico de transações</p>
-            <p className="text-xs text-muted-foreground">
-              Da mais recente para a mais antiga, com o nome e os valores do momento de cada operação.
-            </p>
-          </div>
-          <Button variant="outline" disabled={download.pending} onClick={() => void download.run()}>
-            <Download /> {download.pending ? "Exportando..." : "Exportar CSV"}
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 border-b px-4 pb-4">
-          <span className="text-sm text-muted-foreground">Tipo</span>
-          {TRANSACTION_TYPES.map((type) => (
-            <TypeCheckbox key={type} type={type} checked={types.includes(type)} onToggle={() => toggleType(type)} />
-          ))}
-          <Select value={playerId || ALL_PLAYERS} onValueChange={(next) => setPlayerId(next === ALL_PLAYERS ? "" : next)}>
-            <SelectTrigger size="sm" className="w-auto min-w-44" aria-label="Jogador">
-              <User className="text-muted-foreground" />
-              <SelectValue>Jogador: {selectedPlayer?.name ?? "todos"}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL_PLAYERS}>Todos os jogadores</SelectItem>
-              {players.map((player) => (
-                <SelectItem key={player.id} value={player.id}>
-                  {player.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {filtersActive && (
-            <Button variant="link" size="sm" className="h-auto px-1" onClick={clearFilters}>
-              Limpar filtros
-            </Button>
-          )}
-        </div>
+        {!loadFailed && (
+          <TransactionsToolbar
+            types={types}
+            players={players}
+            playerId={playerId}
+            selectedPlayer={selectedPlayer}
+            filtersActive={filtersActive}
+            exporting={download.pending}
+            onToggleType={toggleType}
+            onPlayerChange={setPlayerId}
+            onClear={clearFilters}
+            onExport={() => void download.run()}
+          />
+        )}
 
         <DataState
           loading={history.loading}
-          error={history.error}
-          errorTitle={filtersActive && !history.networkError ? "O filtro foi recusado" : undefined}
+          error={
+            loadFailed
+              ? `${history.error} Os totais e a exportação ficam indisponíveis até a lista carregar.`
+              : history.error
+          }
+          loadingLabel="Carregando histórico..."
+          errorTitle="Não foi possível carregar o histórico"
+          refusalTitle={filterRefused ? "O filtro foi recusado" : undefined}
           empty={rows.length === 0}
           emptyIcon={History}
           emptyTitle={filtersActive ? "Nenhuma transação com esses filtros" : "Nenhuma transação ainda"}

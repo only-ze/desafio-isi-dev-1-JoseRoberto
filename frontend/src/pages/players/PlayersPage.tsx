@@ -1,4 +1,4 @@
-import { Plus, Users } from "lucide-react";
+import { Plus, SearchX, Users, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { deletePlayer, listPlayers } from "@/api/players";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
@@ -20,7 +20,14 @@ import { PlayerFormDialog } from "./PlayerFormDialog";
 import { ActiveFilters } from "./ActiveFilters";
 import { PlayersFilters } from "./PlayersFilters";
 import { PlayersTable } from "./PlayersTable";
-import { INITIAL_FILTERS, SORT_OPTIONS, toQuery, type FreeTab, type PlayerFilters } from "./PlayerFilters";
+import {
+  hasActiveFilters,
+  INITIAL_FILTERS,
+  SORT_OPTIONS,
+  toQuery,
+  type FreeTab,
+  type PlayerFilters,
+} from "./PlayerFilters";
 
 type FormState = { player: Player | null } | null;
 
@@ -71,6 +78,15 @@ export function PlayersPage() {
     },
   });
 
+  const filtering = hasActiveFilters(filters);
+  const appliedSearch = filters.search.trim();
+  const emptyTitle = !filtering
+    ? "Nenhum jogador cadastrado"
+    : appliedSearch.length >= 2
+      ? `Nenhum jogador encontrado para “${appliedSearch}”`
+      : "Nenhum jogador encontrado com esses filtros";
+  const showToolbar = !players.error && !(players.data && rows.length === 0);
+
   return (
     <>
       <PageHeader
@@ -94,39 +110,60 @@ export function PlayersPage() {
       <ActiveFilters filters={filters} clubs={clubList} onRemove={removeFilter} onClear={clearFilters} />
 
       <Card className="gap-0 overflow-hidden py-0">
-        <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-          <Tabs value={filters.tab} onValueChange={(tab) => handleTab(tab as FreeTab)}>
-            <TabsList>
-              <TabsTrigger value="all">Todos</TabsTrigger>
-              <TabsTrigger
-                value="free"
-                disabled={filters.clubId !== ""}
-                title={filters.clubId ? "Com um clube filtrado não há jogadores livres" : undefined}
-              >
-                Livres
-              </TabsTrigger>
-              <TabsTrigger value="club">Em clubes</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Select value={filters.sort} onValueChange={(sort) => updateFilters({ sort })}>
-            <SelectTrigger className="w-57.5" aria-label="Ordenar por">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  Ordenar: {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {showToolbar && (
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <Tabs value={filters.tab} onValueChange={(tab) => handleTab(tab as FreeTab)}>
+              <TabsList>
+                <TabsTrigger value="all">Todos</TabsTrigger>
+                <TabsTrigger
+                  value="free"
+                  disabled={filters.clubId !== ""}
+                  title={filters.clubId ? "Com um clube filtrado não há jogadores livres" : undefined}
+                >
+                  Livres
+                </TabsTrigger>
+                <TabsTrigger value="club">Em clubes</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Select value={filters.sort} onValueChange={(sort) => updateFilters({ sort })}>
+              <SelectTrigger className="w-57.5" aria-label="Ordenar por">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    Ordenar: {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <DataState
           loading={players.loading}
           error={players.error}
           empty={rows.length === 0}
-          emptyMessage="Nenhum jogador encontrado com esses filtros."
+          loadingLabel="Carregando jogadores..."
+          errorTitle="Não foi possível carregar os jogadores"
+          emptyIcon={filtering ? SearchX : Users}
+          emptyTitle={emptyTitle}
+          emptyMessage={
+            filtering
+              ? "Confira a grafia ou tire alguns filtros. A busca ignora maiúsculas, minúsculas e acentos."
+              : "Com o banco recém-criado, a lista começa vazia."
+          }
+          emptyAction={
+            filtering ? (
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                <X /> Limpar filtros
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => setForm({ player: null })}>
+                <Plus /> Novo jogador
+              </Button>
+            )
+          }
           onRetry={players.reload}
         >
           <div className={cn("transition-opacity", players.refreshing && "opacity-60")}>

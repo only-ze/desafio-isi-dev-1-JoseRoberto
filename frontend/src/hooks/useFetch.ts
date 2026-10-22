@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { errorMessage, isNetworkError } from "@/api/http";
+import { ApiError, errorMessage } from "@/api/http";
 
 interface Result<T> {
   fetcher: unknown;
   version: number;
   data: T | null;
   error: string | null;
-  networkError: boolean;
+  errorStatus: number | null;
 }
 
 export function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>) {
@@ -16,7 +16,7 @@ export function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>) {
   useEffect(() => {
     const controller = new AbortController();
     fetcher(controller.signal)
-      .then((data) => setResult({ fetcher, version, data, error: null, networkError: false }))
+      .then((data) => setResult({ fetcher, version, data, error: null, errorStatus: null }))
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
         setResult((previous) => ({
@@ -24,7 +24,7 @@ export function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>) {
           version,
           data: previous?.data ?? null,
           error: errorMessage(error),
-          networkError: isNetworkError(error),
+          errorStatus: error instanceof ApiError ? error.status : null,
         }));
       });
     return () => controller.abort();
@@ -38,7 +38,7 @@ export function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>) {
   return {
     data,
     error: settled ? result.error : null,
-    networkError: settled && result.networkError,
+    errorStatus: settled ? result.errorStatus : null,
     loading: !settled && data === null,
     refreshing: !settled && data !== null,
     reload,

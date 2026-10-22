@@ -6,6 +6,7 @@ export interface LineupSlot {
   key: string;
   sector: Sector;
   label: string;
+  accessibleName: string;
   positionsLabel: string;
   positions: Position[];
 }
@@ -20,7 +21,7 @@ const ATTACK_ATTRIBUTE: Record<Position, Attribute> = {
   ATA: "shooting",
 };
 
-const SECTOR_SLOT: Record<Sector, Omit<LineupSlot, "key" | "sector">> = {
+const SECTOR_SLOT: Record<Sector, Omit<LineupSlot, "key" | "sector" | "accessibleName">> = {
   goal: { label: "Goleiro", positionsLabel: "GOL", positions: ["GOL"] },
   defense: { label: "Defesa", positionsLabel: "ZAG ou LAT", positions: ["ZAG", "LAT"] },
   midfield: { label: "Meio", positionsLabel: "MEI", positions: ["MEI"] },
@@ -37,7 +38,12 @@ export function formationSummary(formation: Formation): string {
 
 export function slotsFor(formation: Formation): LineupSlot[] {
   return sectorRows(formation).flatMap(({ sector, count }) =>
-    Array.from({ length: count }, (_, index) => ({ key: `${sector}-${index}`, sector, ...SECTOR_SLOT[sector] })),
+    Array.from({ length: count }, (_, index) => ({
+      key: `${sector}-${index}`,
+      sector,
+      accessibleName: count > 1 ? `${SECTOR_SLOT[sector].label} ${index + 1}` : SECTOR_SLOT[sector].label,
+      ...SECTOR_SLOT[sector],
+    })),
   );
 }
 

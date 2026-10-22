@@ -61,7 +61,16 @@ export function ClubsPage() {
           loading={clubs.loading}
           error={clubs.error}
           empty={rows.length === 0}
-          emptyMessage="Nenhum clube cadastrado. Crie o primeiro para começar a comprar jogadores."
+          loadingLabel="Carregando clubes..."
+          errorTitle="Não foi possível carregar os clubes"
+          emptyIcon={Shield}
+          emptyTitle="Nenhum clube cadastrado"
+          emptyMessage="Crie o primeiro clube para começar."
+          emptyAction={
+            <Button variant="outline" size="sm" onClick={() => setCreating(true)}>
+              <Plus /> Novo clube
+            </Button>
+          }
           onRetry={clubs.reload}
         >
           <div className={cn("transition-opacity", clubs.refreshing && "opacity-60")}>

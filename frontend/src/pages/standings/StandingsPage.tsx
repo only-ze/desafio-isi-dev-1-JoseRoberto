@@ -170,9 +170,11 @@ export function StandingsPage() {
               loading={standings.loading}
               error={standings.error}
               empty={rows.length === 0}
+              loadingLabel="Carregando classificação..."
+              errorTitle="Não foi possível carregar a classificação"
               emptyIcon={ListOrdered}
-              emptyTitle="Nenhum clube na liga"
-              emptyMessage="A classificação lista todos os clubes, inclusive os que ainda não jogaram."
+              emptyTitle="Nenhum clube cadastrado"
+              emptyMessage="A classificação mostra todos os clubes, mesmo os que ainda não jogaram."
               onRetry={standings.reload}
             >
               <div className={cn("transition-opacity", standings.refreshing && "opacity-60")}>

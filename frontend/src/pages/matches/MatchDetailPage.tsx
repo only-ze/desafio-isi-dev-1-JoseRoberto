@@ -1,4 +1,4 @@
-import { ArrowLeft, Thermometer, Volleyball } from "lucide-react";
+import { ArrowLeft, SearchX, Thermometer, Volleyball } from "lucide-react";
 import { useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getMatch } from "@/api/matches";
@@ -48,7 +48,15 @@ export function MatchDetailPage() {
       <>
         {backLink}
         <Card className="py-0">
-          <DataState loading={result.loading} error={result.error} empty={false} onRetry={result.reload}>
+          <DataState
+            loading={result.loading}
+            error={result.error}
+            empty={false}
+            loadingLabel="Carregando partida..."
+            errorTitle={result.errorStatus === 404 ? "Partida não encontrada" : "Não foi possível carregar a partida"}
+            errorIcon={result.errorStatus === 404 ? SearchX : undefined}
+            onRetry={result.errorStatus === 404 ? undefined : result.reload}
+          >
             {null}
           </DataState>
         </Card>

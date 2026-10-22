@@ -30,7 +30,14 @@ export function MatchesPage() {
 
   const rows = history.data ?? [];
   const lastMatch = latest.data?.[0];
+  const noMatches = latest.data !== null && latest.data.length === 0;
   const selectedClub = clubsById.get(Number(clubId));
+
+  const newMatchButton = (variant: "default" | "outline", size: "default" | "sm") => (
+    <Button variant={variant} size={size} onClick={() => setCreating(true)}>
+      <Plus /> Nova partida
+    </Button>
+  );
 
   return (
     <>
@@ -38,11 +45,7 @@ export function MatchesPage() {
         icon={Swords}
         title="Partidas"
         description="Jogue partidas entre clubes com os 5 titulares escalados e acompanhe o histórico."
-        actions={
-          <Button onClick={() => setCreating(true)}>
-            <Plus /> Nova partida
-          </Button>
-        }
+        actions={noMatches ? undefined : newMatchButton("default", "default")}
       />
 
       {lastMatch && (
@@ -63,38 +66,43 @@ export function MatchesPage() {
       )}
 
       <Card className="gap-0 overflow-hidden py-0">
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b p-4">
-          <div>
-            <p className="font-medium">Histórico de partidas</p>
-            <p className="text-xs text-muted-foreground">Da mais recente para a mais antiga.</p>
+        {!noMatches && (
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b p-4">
+            <div>
+              <p className="font-medium">Histórico de partidas</p>
+              <p className="text-xs text-muted-foreground">Da mais recente para a mais antiga.</p>
+            </div>
+            <Select value={clubId || ALL_CLUBS} onValueChange={(next) => setClubId(next === ALL_CLUBS ? "" : next)}>
+              <SelectTrigger className="w-56 *:data-[slot=select-value]:flex-1" aria-label="Filtrar por clube">
+                <Shield className="text-muted-foreground" />
+                <SelectValue>Clube: {selectedClub?.name ?? "todos"}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_CLUBS}>Todos os clubes</SelectItem>
+                {clubs.map((club) => (
+                  <SelectItem key={club.id} value={String(club.id)}>
+                    {club.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={clubId || ALL_CLUBS} onValueChange={(next) => setClubId(next === ALL_CLUBS ? "" : next)}>
-            <SelectTrigger className="w-56 *:data-[slot=select-value]:flex-1" aria-label="Filtrar por clube">
-              <Shield className="text-muted-foreground" />
-              <SelectValue>Clube: {selectedClub?.name ?? "todos"}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL_CLUBS}>Todos os clubes</SelectItem>
-              {clubs.map((club) => (
-                <SelectItem key={club.id} value={String(club.id)}>
-                  {club.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        )}
 
         <DataState
           loading={history.loading}
           error={history.error}
           empty={rows.length === 0}
+          loadingLabel="Carregando partidas..."
+          errorTitle="Não foi possível carregar as partidas"
           emptyIcon={Swords}
-          emptyTitle={clubId ? "Nenhuma partida desse clube" : "Nenhuma partida ainda"}
+          emptyTitle={clubId ? "Nenhuma partida desse clube" : "Nenhuma partida jogada"}
           emptyMessage={
             clubId
               ? "O clube ainda não jogou como mandante nem como visitante."
-              : "Jogue a primeira partida entre dois clubes com a escalação completa."
+              : "Escale os 5 titulares de dois clubes e jogue a primeira partida; o resultado aparece aqui e na classificação."
           }
+          emptyAction={clubId ? undefined : newMatchButton("outline", "sm")}
           onRetry={history.reload}
         >
           <div className={cn("transition-opacity", history.refreshing && "opacity-60")}>
@@ -106,7 +114,9 @@ export function MatchesPage() {
         </DataState>
       </Card>
       <p className="mt-3 text-xs text-muted-foreground">
-        Partidas da mais recente para a mais antiga, com filtro por clube. "Ver duelos" abre a partida.
+        {noMatches
+          ? "Nenhuma partida jogada ainda. A classificação continua com todos os clubes, zerados."
+          : "Partidas da mais recente para a mais antiga, com filtro por clube. \"Ver duelos\" abre a partida."}
       </p>
 
       {creating && (

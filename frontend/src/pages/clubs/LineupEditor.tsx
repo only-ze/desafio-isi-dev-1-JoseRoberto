@@ -231,7 +231,7 @@ export function LineupEditor({ clubId, clubName, squad, lineup, onSaved }: Lineu
                         >
                           <SelectTrigger
                             className="w-56"
-                            aria-label={`Titular: ${slot.label}`}
+                            aria-label={`Titular: ${slot.accessibleName}`}
                             aria-invalid={Boolean(error)}
                           >
                             <SelectValue

@@ -20,7 +20,14 @@ export function LineupTab({ clubId, clubName, squad }: LineupTabProps) {
   if (!current) {
     return (
       <Card className="py-0">
-        <DataState loading={lineup.loading} error={lineup.error} empty={false} onRetry={lineup.reload}>
+        <DataState
+          loading={lineup.loading}
+          error={lineup.error}
+          empty={false}
+          loadingLabel="Carregando escalação..."
+          errorTitle="Não foi possível carregar a escalação"
+          onRetry={lineup.reload}
+        >
           {null}
         </DataState>
       </Card>
