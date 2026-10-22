@@ -1,7 +1,6 @@
 import type { Player } from "@/types/api";
-import type { Formation, Position } from "@/utils/labels";
-
-export type Sector = "goal" | "defense" | "midfield" | "attack";
+import { LINE_SECTORS, SECTOR_COUNTS, sectorRows, type Sector } from "@/utils/formations";
+import { ATTRIBUTE_LABEL, type Attribute, type Formation, type Position } from "@/utils/labels";
 
 export interface LineupSlot {
   key: string;
@@ -13,28 +12,12 @@ export interface LineupSlot {
 
 export type SlotSelection = Record<string, string>;
 
-type Attribute = "shooting" | "passing" | "dribbling" | "defending";
-
-export const ATTRIBUTE_LABEL: Record<Attribute, string> = {
-  shooting: "Finalização",
-  passing: "Passe",
-  dribbling: "Drible",
-  defending: "Defesa",
-};
-
 const ATTACK_ATTRIBUTE: Record<Position, Attribute> = {
   GOL: "defending",
   ZAG: "dribbling",
   LAT: "dribbling",
   MEI: "passing",
   ATA: "shooting",
-};
-
-const SECTOR_COUNTS: Record<Formation, Record<Exclude<Sector, "goal">, number>> = {
-  "3-1": { defense: 3, midfield: 0, attack: 1 },
-  "2-2": { defense: 2, midfield: 0, attack: 2 },
-  "2-1-1": { defense: 2, midfield: 1, attack: 1 },
-  "1-2-1": { defense: 1, midfield: 2, attack: 1 },
 };
 
 const SECTOR_SLOT: Record<Sector, Omit<LineupSlot, "key" | "sector">> = {
@@ -44,22 +27,12 @@ const SECTOR_SLOT: Record<Sector, Omit<LineupSlot, "key" | "sector">> = {
   attack: { label: "Ataque", positionsLabel: "ATA", positions: ["ATA"] },
 };
 
-const LINE_SECTORS = ["defense", "midfield", "attack"] as const;
-
 export function formationSummary(formation: Formation): string {
   const counts = SECTOR_COUNTS[formation];
   const text = LINE_SECTORS.filter((sector) => counts[sector] > 0)
     .map((sector) => `${SECTOR_SLOT[sector].label.toLowerCase()} ${counts[sector]}`)
     .join(", ");
   return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-export function sectorRows(formation: Formation): { sector: Sector; count: number }[] {
-  const counts = SECTOR_COUNTS[formation];
-  return [
-    { sector: "goal", count: 1 },
-    ...LINE_SECTORS.filter((sector) => counts[sector] > 0).map((sector) => ({ sector, count: counts[sector] })),
-  ];
 }
 
 export function slotsFor(formation: Formation): LineupSlot[] {

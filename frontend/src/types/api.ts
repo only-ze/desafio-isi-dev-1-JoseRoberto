@@ -1,4 +1,12 @@
-import type { Condition, ContractStatus, Formation, Position, TransactionType } from "@/utils/labels";
+import type {
+  Attribute,
+  Condition,
+  ContractStatus,
+  Formation,
+  MatchResult,
+  Position,
+  TransactionType,
+} from "@/utils/labels";
 
 export interface Player {
   id: number;
@@ -135,7 +143,7 @@ export interface DuelParticipant {
   player_name: string;
   position: Position;
   condition: Condition;
-  attribute: string;
+  attribute: Attribute;
   value: number;
 }
 
@@ -159,7 +167,12 @@ export interface MatchSummary {
   played_at: string;
   home: MatchSide;
   away: MatchSide;
-  result: "MANDANTE" | "VISITANTE" | "EMPATE";
+  result: MatchResult;
+}
+
+export interface MatchCreateInput {
+  home_club_id: number;
+  away_club_id: number;
 }
 
 export interface Match extends MatchSummary {

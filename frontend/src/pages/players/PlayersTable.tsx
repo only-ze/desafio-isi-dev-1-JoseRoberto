@@ -1,6 +1,6 @@
 import { MoreHorizontal, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
 import { ConditionBadge, PositionBadge } from "@/components/badges";
+import { ClubLink } from "@/components/ClubTag";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,14 +41,7 @@ function AgilityBar({ value }: { value: number }) {
 function ClubCell({ player, clubsById }: { player: Player; clubsById: Map<number, Club> }) {
   if (player.club_id === null) return <Badge variant="secondary">Livre</Badge>;
   const club = clubsById.get(player.club_id);
-  return (
-    <div className="flex items-center gap-2">
-      <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">{club?.acronym ?? "—"}</span>
-      <Link to={`/clubs/${player.club_id}`} className="whitespace-nowrap underline-offset-4 hover:underline">
-        {club?.name ?? `Clube ${player.club_id}`}
-      </Link>
-    </div>
-  );
+  return <ClubLink clubId={player.club_id} name={club?.name ?? `Clube ${player.club_id}`} acronym={club?.acronym} />;
 }
 
 export function PlayersTable({ players, clubsById, onBuy, onEdit, onChangeCondition, onDelete }: PlayersTableProps) {

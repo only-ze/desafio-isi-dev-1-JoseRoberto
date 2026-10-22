@@ -1,6 +1,5 @@
 import { Plus, Users } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { listClubs } from "@/api/clubs";
 import { deletePlayer, listPlayers } from "@/api/players";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { DataState } from "@/components/DataState";
@@ -11,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAction } from "@/hooks/useAction";
+import { useClubs } from "@/hooks/useClubs";
 import { useFetch } from "@/hooks/useFetch";
 import { cn } from "@/lib/utils";
 import type { Player } from "@/types/api";
@@ -24,9 +24,6 @@ import { INITIAL_FILTERS, SORT_OPTIONS, toQuery, type FreeTab, type PlayerFilter
 
 type FormState = { player: Player | null } | null;
 
-const fetchClubs = (signal: AbortSignal) => listClubs("name", signal);
-const EMPTY_CLUBS: Awaited<ReturnType<typeof listClubs>> = [];
-
 export function PlayersPage() {
   const [filters, setFilters] = useState<PlayerFilters>(INITIAL_FILTERS);
   const [resetKey, setResetKey] = useState(0);
@@ -38,11 +35,9 @@ export function PlayersPage() {
   const query = useMemo(() => toQuery(filters), [filters]);
   const fetchPlayers = useCallback((signal: AbortSignal) => listPlayers(query, signal), [query]);
   const players = useFetch(fetchPlayers);
-  const clubs = useFetch(fetchClubs);
+  const { clubs: clubList, clubsById, error: clubsError, reload: reloadClubs } = useClubs();
 
   const rows = players.data?.data ?? [];
-  const clubList = clubs.data ?? EMPTY_CLUBS;
-  const clubsById = useMemo(() => new Map(clubList.map((club) => [club.id, club])), [clubList]);
 
   const updateFilters = useCallback((patch: Partial<PlayerFilters>) => {
     setFilters((current) => ({ ...current, page: 1, ...patch }));
@@ -165,9 +160,12 @@ export function PlayersPage() {
         <BuyDialog
           player={buyTarget}
           clubs={clubList}
-          clubsError={clubs.error}
+          clubsError={clubsError}
           onClose={() => setBuyTarget(null)}
-          onBought={players.reload}
+          onBought={() => {
+            players.reload();
+            reloadClubs();
+          }}
         />
       )}
       <ConfirmDialog

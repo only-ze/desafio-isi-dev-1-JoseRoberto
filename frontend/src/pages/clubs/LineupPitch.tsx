@@ -1,14 +1,9 @@
-import { Plus, Thermometer } from "lucide-react";
-import type { CSSProperties } from "react";
+import { Plus } from "lucide-react";
+import { GRASS_STYLE, PitchPlayer } from "@/components/PitchPlayer";
 import type { Player } from "@/types/api";
-import { initials } from "@/utils/format";
+import { sectorRows } from "@/utils/formations";
 import type { Formation } from "@/utils/labels";
-import { sectorRows, type LineupSlot } from "./lineupSlots";
-
-const GRASS: CSSProperties = {
-  backgroundColor: "#1f5f32",
-  backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 10%, transparent 10% 20%)",
-};
+import type { LineupSlot } from "./lineupSlots";
 
 function rowOffsets(formation: Formation): number[] {
   const lineRows = sectorRows(formation).length - 1;
@@ -39,7 +34,7 @@ function FieldLines({ strokeWidth }: { strokeWidth: number }) {
 export function MiniPitch({ formation }: { formation: Formation }) {
   const offsets = rowOffsets(formation);
   return (
-    <div className="relative h-9 w-7 shrink-0 overflow-hidden rounded-sm" style={GRASS} aria-hidden>
+    <div className="relative h-9 w-7 shrink-0 overflow-hidden rounded-sm" style={GRASS_STYLE} aria-hidden>
       <FieldLines strokeWidth={3} />
       {sectorRows(formation).flatMap(({ sector, count }, row) =>
         Array.from({ length: count }, (_, index) => (
@@ -76,20 +71,11 @@ function Marker({ slot, player }: PitchMarker) {
     );
   }
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative flex size-9 items-center justify-center rounded-full border-2 border-white bg-primary text-xs font-semibold text-primary-foreground shadow">
-        {initials(player.name)}
-        {player.condition === "MAL_CONDICIONADO" && (
-          <span
-            className="absolute -top-1.5 -left-1.5 flex size-4 items-center justify-center rounded-full border border-white bg-amber-600"
-            title="Mal condicionado"
-          >
-            <Thermometer className="size-2.5" />
-          </span>
-        )}
-      </div>
-      <span className="rounded bg-black/50 px-1.5 text-[11px] whitespace-nowrap text-white">{surname(player.name)}</span>
-    </div>
+    <PitchPlayer
+      name={player.name}
+      label={surname(player.name)}
+      unfit={player.condition === "MAL_CONDICIONADO"}
+    />
   );
 }
 
@@ -102,7 +88,7 @@ export function LineupPitch({ formation, markers }: LineupPitchProps) {
   const offsets = rowOffsets(formation);
   const rows = sectorRows(formation);
   return (
-    <div className="relative aspect-5/6 w-full overflow-hidden rounded-lg" style={GRASS}>
+    <div className="relative aspect-5/6 w-full overflow-hidden rounded-lg" style={GRASS_STYLE}>
       <FieldLines strokeWidth={0.5} />
       {rows.flatMap(({ sector, count }, row) =>
         markers
