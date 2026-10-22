@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
+
 from app.utils.validators import fold_text, round_money
 
 INITIAL_CASH = Decimal("300.00")
@@ -18,8 +19,13 @@ FORMATIONS: dict[str, tuple[int, int, int]] = {
 }
 LINEUP_SIZE = 5
 _SECTOR = {
-    "GOL": "goalkeeper", "ZAG": "defense", "LAT": "defense", "MEI": "midfield", "ATA": "attack",
+    "GOL": "goalkeeper",
+    "ZAG": "defense",
+    "LAT": "defense",
+    "MEI": "midfield",
+    "ATA": "attack",
 }
+
 
 def acronym_matches_name(acronym: str, name: str) -> bool:
     letters = [char for char in fold_text(name) if char.isalpha()]
@@ -34,12 +40,14 @@ def acronym_matches_name(acronym: str, name: str) -> bool:
             return False
     return True
 
+
 def remaining_days(loyalty_until: datetime, moment: datetime) -> int:
     remaining = loyalty_until - moment
     if remaining <= timedelta(0):
         return 0
     whole_days, rest = divmod(remaining, ONE_DAY)
     return whole_days + (1 if rest else 0)
+
 
 def penalty_rate(days: int) -> int:
     if days == 0:
@@ -50,14 +58,18 @@ def penalty_rate(days: int) -> int:
         return 10
     return 20
 
+
 def purchase_fee(value: Decimal) -> Decimal:
     return round_money(value * FEE_RATE) if value > FEE_THRESHOLD else Decimal("0.00")
+
 
 def exceeds_cash_limit(cost: Decimal, cash: Decimal) -> bool:
     return cost * 2 > cash
 
+
 def sale_penalty(value: Decimal, rate: int) -> Decimal:
     return min(round_money(value * rate / 100), MAX_PENALTY)
+
 
 def sale_commission(profit: Decimal) -> Decimal:
     if profit <= 0:
@@ -65,7 +77,8 @@ def sale_commission(profit: Decimal) -> Decimal:
     first_part = min(profit, Decimal("10.00"))
     second_part = profit - first_part
     return round_money(first_part * Decimal("0.10") + second_part * Decimal("0.20"))
-  
+
+
 def fits_formation(formation: str, positions: list[str]) -> bool:
     defense, midfield, attack = FORMATIONS[formation]
     sectors = [_SECTOR[position] for position in positions]

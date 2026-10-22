@@ -1,11 +1,14 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
 from app.models import Transacao
+
 
 def add(db: Session, transaction: Transacao) -> Transacao:
     db.add(transaction)
     db.flush()
     return transaction
+
 
 def club_sold_player(db: Session, club_id: int, player_id: int) -> bool:
     stmt = select(Transacao.id).where(
@@ -14,6 +17,7 @@ def club_sold_player(db: Session, club_id: int, player_id: int) -> bool:
         Transacao.tipo == "VENDA",
     )
     return db.scalar(stmt.limit(1)) is not None
+
 
 def list_by_club(
     db: Session,

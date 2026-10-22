@@ -1,13 +1,16 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
+
+from app.api.deps import PathId
 from app.db.database import get_db
 from app.schemas.matches_schema import MatchCreate, MatchListQuery, MatchOut, MatchSummaryOut
 from app.services import match_service
-from app.api.deps import PathId
 from app.utils.location import location_of
 
 router = APIRouter(prefix="/matches", tags=["Partidas"])
+
 
 @router.post("", response_model=MatchOut, status_code=201)
 def play_match(data: MatchCreate, response: Response, db: Session = Depends(get_db)):

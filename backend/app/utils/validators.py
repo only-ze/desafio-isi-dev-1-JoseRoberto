@@ -10,24 +10,25 @@ POSITIONS: tuple[str, ...] = get_args(Position)
 Formation = Literal["3-1", "2-2", "2-1-1", "1-2-1"]
 _MULTIPLE_SPACES = re.compile(" {2,}")
 
+
 def round_money(value: Decimal) -> Decimal:
     return value.quantize(CENT, rounding=ROUND_HALF_UP)
+
 
 def normalize_text(value: str) -> str:
     if any(unicodedata.category(char) == "Cc" for char in value):
         raise ValueError("não pode conter caracteres de controle")
     return _MULTIPLE_SPACES.sub(" ", value.strip(" "))
 
+
 def count_words(text: str) -> int:
-    return sum(
-        1
-        for word in text.split(" ")
-        if any(unicodedata.category(char).startswith("L") for char in word)
-    )
-    
+    return sum(1 for word in text.split(" ") if any(unicodedata.category(char).startswith("L") for char in word))
+
+
 def fold_text(value: str) -> str:
     decomposed = unicodedata.normalize("NFD", value.lower())
     return "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+
 
 def squad_sort_key(position: str, name: str, player_id: int) -> tuple[int, str, int]:
     return (POSITIONS.index(position), fold_text(name), player_id)

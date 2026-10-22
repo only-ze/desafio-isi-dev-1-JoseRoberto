@@ -1,16 +1,21 @@
 from datetime import datetime
 from decimal import Decimal
+
 from sqlalchemy import CheckConstraint, ForeignKey, Index, Integer, Numeric, String, text
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.models.base import Base, timestamp
+
 
 class Contrato(Base):
     __tablename__ = "contratos"
     __table_args__ = (
         CheckConstraint("situacao IN ('ATIVO','ENCERRADO','RESCINDIDO')", name="ck_contratos_situacao"),
         Index(
-            "uq_contratos_jogador_ativo", "jogador_id",
-            unique=True, postgresql_where=text("situacao = 'ATIVO'"),
+            "uq_contratos_jogador_ativo",
+            "jogador_id",
+            unique=True,
+            postgresql_where=text("situacao = 'ATIVO'"),
         ),
     )
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

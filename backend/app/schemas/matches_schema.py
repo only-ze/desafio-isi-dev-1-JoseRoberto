@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict, model_validator
+
 from app.schemas.validators_schema import BodyId, BrtDateTime, QueryInt
+
 
 class MatchCreate(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -13,14 +15,17 @@ class MatchCreate(BaseModel):
             raise ValueError("o mandante e o visitante não podem ser o mesmo clube")
         return self
 
+
 class MatchListQuery(BaseModel):
     club_id: QueryInt | None = None
+
 
 class MatchSideOut(BaseModel):
     club_id: int
     club_name: str
     formation: str
     goals: int
+
 
 class DuelParticipantOut(BaseModel):
     player_id: int
@@ -30,12 +35,14 @@ class DuelParticipantOut(BaseModel):
     attribute: str
     value: int
 
+
 class DuelOut(BaseModel):
     order: int
     attacking_club_id: int
     attacker: DuelParticipantOut
     defender: DuelParticipantOut
     goal: bool
+
 
 class MatchSummaryOut(BaseModel):
     id: int
@@ -44,8 +51,10 @@ class MatchSummaryOut(BaseModel):
     away: MatchSideOut
     result: str
 
+
 class MatchOut(MatchSummaryOut):
     duels: list[DuelOut]
+
 
 class StandingOut(BaseModel):
     position: int

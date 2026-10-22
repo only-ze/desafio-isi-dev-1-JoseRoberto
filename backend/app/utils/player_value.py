@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from app.utils.validators import round_money
 
 MIN_VALUE = Decimal("1.00")
@@ -23,19 +24,21 @@ CONDITION_DISCOUNT = {
     "DOENTE": Decimal(30),
 }
 
+
 def calculate_overall(position: str, attributes: tuple[int, ...]) -> int:
-    weighted_sum = sum(a * w for a, w in zip(attributes, OVERALL_WEIGHTS[position]))
+    weighted_sum = sum(a * w for a, w in zip(attributes, OVERALL_WEIGHTS[position], strict=True))
     return (weighted_sum + 50) // 100
+
 
 def calculate_base_value(overall: int, potential: int, age: int) -> Decimal:
     part = sum(
-        ((min(overall, last) - first + 1) * rate
-         for first, last, rate in _OVERALL_BANDS if overall >= first),
+        ((min(overall, last) - first + 1) * rate for first, last, rate in _OVERALL_BANDS if overall >= first),
         Decimal(0),
     )
     if age <= 21:
         part = part * (100 + potential - overall) / 100
     return max(round_money(part), MIN_VALUE)
+
 
 def calculate_market_value(base_value: Decimal, condition: str, agility: int, age: int) -> Decimal:
     discount = CONDITION_DISCOUNT[condition]

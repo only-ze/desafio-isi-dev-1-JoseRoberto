@@ -1,13 +1,16 @@
 import logging
+
 from fastapi import FastAPI, Request
 
 logger = logging.getLogger("app.http")
+
 
 def configure_logging() -> None:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    ) 
+    )
+
 
 def register_request_logging(app: FastAPI) -> None:
     @app.middleware("http")

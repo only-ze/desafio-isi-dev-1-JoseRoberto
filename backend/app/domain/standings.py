@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+
 from app.utils.validators import fold_text
+
 
 @dataclass
 class StandingRow:
@@ -20,6 +22,7 @@ class StandingRow:
     def points(self) -> int:
         return self.wins * 3 + self.draws
 
+
 def _register(row: StandingRow, goals_for: int, goals_against: int) -> None:
     row.played += 1
     row.goals_for += goals_for
@@ -31,9 +34,8 @@ def _register(row: StandingRow, goals_for: int, goals_against: int) -> None:
     else:
         row.losses += 1
 
-def compute_standings(
-    clubs: list[tuple[int, str]], matches: list[tuple[int, int, int, int]]
-) -> list[StandingRow]:
+
+def compute_standings(clubs: list[tuple[int, str]], matches: list[tuple[int, int, int, int]]) -> list[StandingRow]:
     rows = {club_id: StandingRow(club_id, name) for club_id, name in clubs}
     for home_id, away_id, home_goals, away_goals in matches:
         _register(rows[home_id], home_goals, away_goals)

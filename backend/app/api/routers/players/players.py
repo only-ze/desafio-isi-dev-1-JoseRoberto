@@ -1,14 +1,24 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
+
 from app.api.deps import PathId
-from app.utils.location import location_of
 from app.db.database import get_db
-from app.schemas.players_schema import ConditionUpdate, PlayerCreate, PlayerListQuery, PlayerOut, PlayerPage, PlayerUpdate
+from app.schemas.players_schema import (
+    ConditionUpdate,
+    PlayerCreate,
+    PlayerListQuery,
+    PlayerOut,
+    PlayerPage,
+    PlayerUpdate,
+)
 from app.services import player_service
 from app.services.player_mapper import to_player_out
+from app.utils.location import location_of
 
 router = APIRouter(prefix="/players", tags=["Jogadores"])
+
 
 @router.post("", response_model=PlayerOut, status_code=201)
 def create_player(
@@ -20,6 +30,7 @@ def create_player(
     response.headers["Location"] = location_of("players", player.id)
     return to_player_out(player)
 
+
 @router.get("", response_model=PlayerPage)
 def list_players(
     query: Annotated[PlayerListQuery, Query()],
@@ -27,17 +38,21 @@ def list_players(
 ):
     return player_service.list_players(db, query)
 
+
 @router.get("/{id}", response_model=PlayerOut)
 def get_player(id: PathId, db: Session = Depends(get_db)):
     return to_player_out(player_service.get_player(db, id))
+
 
 @router.put("/{id}", response_model=PlayerOut)
 def update_player(id: PathId, data: PlayerUpdate, db: Session = Depends(get_db)):
     return to_player_out(player_service.update_player(db, id, data))
 
+
 @router.patch("/{id}/condition", response_model=PlayerOut)
 def change_condition(id: PathId, data: ConditionUpdate, db: Session = Depends(get_db)):
     return to_player_out(player_service.change_condition(db, id, data))
+
 
 @router.delete("/{id}", status_code=204, response_class=Response)
 def delete_player(id: PathId, db: Session = Depends(get_db)):

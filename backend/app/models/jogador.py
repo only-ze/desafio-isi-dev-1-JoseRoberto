@@ -1,7 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
+
 from sqlalchemy import CheckConstraint, ForeignKey, Integer, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.models.base import Base, CriadoEmMixin, timestamp
 
 
@@ -35,7 +37,5 @@ class Jogador(CriadoEmMixin, Base):
     fisico: Mapped[int] = mapped_column(nullable=False)
     potencial: Mapped[int] = mapped_column(nullable=False)
     excluido_em: Mapped[datetime | None] = timestamp(nullable=True)
-    atualizado_em: Mapped[datetime] = timestamp(
-        server_default=func.now(), onupdate=func.now(), nullable=False
-    )
+    atualizado_em: Mapped[datetime] = timestamp(server_default=func.now(), onupdate=func.now(), nullable=False)
     clube = relationship("Clube", back_populates="jogadores")

@@ -1,13 +1,15 @@
 from sqlalchemy.orm import Session
+
 from app.core.clock import now
 from app.core.errors import BusinessRuleError, NotFoundError
 from app.domain import match_engine
-from app.domain.rules import LINEUP_SIZE
 from app.domain.match_engine import DuelResult, Starter, Team
+from app.domain.rules import LINEUP_SIZE
 from app.models import Clube, DueloPartida, Jogador, Partida
-from app.repositories import club_repository, escalacao_repository, match_repository
+from app.repositories import club_repository, lineup_repository, match_repository
 from app.schemas.matches_schema import MatchCreate, MatchListQuery, MatchOut, MatchSummaryOut
 from app.services.match_mapper import to_match_out, to_match_summary
+
 
 def play_match(db: Session, data: MatchCreate) -> MatchOut:
     clubs: dict[int, Clube] = {}
@@ -35,33 +37,40 @@ def play_match(db: Session, data: MatchCreate) -> MatchOut:
     db.commit()
     return out
 
+
 def get_match(db: Session, match_id: int) -> MatchOut:
     match = match_repository.get(db, match_id)
     if match is None:
         raise NotFoundError("Partida não encontrada.")
     return to_match_out(match, club_repository.names_by_id(db))
 
+
 def list_matches(db: Session, query: MatchListQuery) -> list[MatchSummaryOut]:
     if query.club_id is not None and not club_repository.exists(db, query.club_id):
         raise NotFoundError("Clube não encontrado.")
     names = club_repository.names_by_id(db)
-    return [
-        to_match_summary(match, names)
-        for match in match_repository.list_matches(db, query.club_id)
-    ]
+    return [to_match_summary(match, names) for match in match_repository.list_matches(db, query.club_id)]
+
 
 def _build_team(db: Session, club: Clube) -> Team:
-    players = escalacao_repository.list_players(db, club.id)
+    players = lineup_repository.list_players(db, club.id)
     if club.formacao is None or len(players) != LINEUP_SIZE:
         raise BusinessRuleError(f"O clube {club.nome} não tem a escalação completa.")
     return match_engine.build_team(club.id, club.formacao, [_to_starter(p) for p in players])
 
+
 def _to_starter(player: Jogador) -> Starter:
     return Starter(
-        player_id=player.id, name=player.nome, position=player.posicao,
-        condition=player.condicao, shooting=player.finalizacao, passing=player.passe,
-        dribbling=player.drible, defending=player.defesa,
+        player_id=player.id,
+        name=player.nome,
+        position=player.posicao,
+        condition=player.condicao,
+        shooting=player.finalizacao,
+        passing=player.passe,
+        dribbling=player.drible,
+        defending=player.defesa,
     )
+
 
 def _to_duel_row(duel: DuelResult) -> DueloPartida:
     return DueloPartida(

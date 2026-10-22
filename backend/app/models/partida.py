@@ -1,9 +1,12 @@
 from datetime import datetime
+
 from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.models.base import Base, timestamp
 
 FORMACOES = "('3-1','2-2','2-1-1','1-2-1')"
+
 
 class Partida(Base):
     __tablename__ = "partidas"
@@ -34,9 +37,7 @@ class DueloPartida(Base):
         CheckConstraint("ordem BETWEEN 1 AND 6", name="ck_duelos_ordem"),
         CheckConstraint("condicao_atacante IN ('APTO','MAL_CONDICIONADO')", name="ck_duelos_cond_atacante"),
         CheckConstraint("condicao_defensor IN ('APTO','MAL_CONDICIONADO')", name="ck_duelos_cond_defensor"),
-        CheckConstraint(
-            "atributo_ataque IN ('shooting','passing','dribbling')", name="ck_duelos_atributo_ataque"
-        ),
+        CheckConstraint("atributo_ataque IN ('shooting','passing','dribbling')", name="ck_duelos_atributo_ataque"),
         CheckConstraint("atributo_defesa = 'defending'", name="ck_duelos_atributo_defesa"),
     )
 

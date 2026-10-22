@@ -1,7 +1,10 @@
 from datetime import datetime
+
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.models.base import Base, timestamp
+
 
 class Escalacao(Base):
     __tablename__ = "escalacoes"

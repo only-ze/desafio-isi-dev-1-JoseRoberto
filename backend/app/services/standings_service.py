@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
+
 from app.domain.standings import compute_standings
 from app.repositories import club_repository, match_repository
 from app.schemas.matches_schema import StandingOut
+
 
 def get_standings(db: Session) -> list[StandingOut]:
     clubs = [(club.id, club.nome) for club in club_repository.list_all(db)]

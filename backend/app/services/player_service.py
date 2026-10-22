@@ -1,15 +1,23 @@
 from decimal import Decimal
+
 from sqlalchemy.orm import Session
-from app.utils.player_value import calculate_base_value, calculate_overall
-from app.models import Jogador
-from app.repositories import player_repository
-from app.schemas.players_schema import ConditionUpdate, PageMeta, PlayerListQuery, PlayerOut, PlayerPage, PlayerCreate, PlayerUpdate
-from app.utils.validators import POSITIONS, fold_text
-from app.core.errors import BusinessRuleError, NotFoundError
-from app.repositories import club_repository
-from app.services.player_mapper import to_player_out
+
 from app.core.clock import now
-from app.repositories import escalacao_repository
+from app.core.errors import BusinessRuleError, NotFoundError
+from app.models import Jogador
+from app.repositories import club_repository, lineup_repository, player_repository
+from app.schemas.players_schema import (
+    ConditionUpdate,
+    PageMeta,
+    PlayerCreate,
+    PlayerListQuery,
+    PlayerOut,
+    PlayerPage,
+    PlayerUpdate,
+)
+from app.services.player_mapper import to_player_out
+from app.utils.player_value import calculate_base_value, calculate_overall
+from app.utils.validators import POSITIONS, fold_text
 
 MIN_AGE, MAX_AGE = 16, 45
 MIN_VALUE, MAX_VALUE = Decimal("0"), Decimal("550")
@@ -22,6 +30,7 @@ _SORT_KEYS = {
     "age_desc": lambda p: -p.age,
     "position": lambda p: POSITIONS.index(p.position),
 }
+
 
 def create_player(db: Session, data: PlayerCreate) -> Jogador:
     overall = calculate_overall(data.position, data.attributes())
@@ -46,11 +55,13 @@ def create_player(db: Session, data: PlayerCreate) -> Jogador:
     db.refresh(player)
     return player
 
+
 def get_player(db: Session, player_id: int, lock: bool = False) -> Jogador:
     player = player_repository.get_active(db, player_id, lock=lock)
     if player is None:
         raise NotFoundError("Jogador não encontrado.")
     return player
+
 
 def list_players(db: Session, query: PlayerListQuery) -> PlayerPage:
     if query.club_id is not None and not club_repository.exists(db, query.club_id):
@@ -75,12 +86,12 @@ def list_players(db: Session, query: PlayerListQuery) -> PlayerPage:
         term = fold_text(query.search)
         items = [item for item in items if term in fold_text(item.name)]
 
-    items.sort(key=_sort_key(query.sort))
+    items.sort(key=_sort_key(query.sort_criteria))
 
     total_items = len(items)
     start = (query.page - 1) * query.limit
     return PlayerPage(
-        data=items[start:start + query.limit],
+        data=items[start : start + query.limit],
         meta=PageMeta(
             page=query.page,
             limit=query.limit,
@@ -88,7 +99,8 @@ def list_players(db: Session, query: PlayerListQuery) -> PlayerPage:
             total_pages=(total_items + query.limit - 1) // query.limit,
         ),
     )
-    
+
+
 def update_player(db: Session, player_id: int, data: PlayerUpdate) -> Jogador:
     player = get_player(db, player_id)
 
@@ -104,6 +116,8 @@ def update_player(db: Session, player_id: int, data: PlayerUpdate) -> Jogador:
     db.commit()
     db.refresh(player)
     return player
+
+
 def change_condition(db: Session, player_id: int, data: ConditionUpdate) -> Jogador:
     player = get_player(db, player_id)
     if player.condicao == "DOENTE" and data.condition == "APTO":
@@ -111,10 +125,11 @@ def change_condition(db: Session, player_id: int, data: ConditionUpdate) -> Joga
 
     player.condicao = data.condition
     if data.condition == "DOENTE":
-        escalacao_repository.remove_player(db, player.id)
+        lineup_repository.remove_player(db, player.id)
     db.commit()
     db.refresh(player)
     return player
+
 
 def delete_player(db: Session, player_id: int) -> None:
     player = get_player(db, player_id)
@@ -122,11 +137,9 @@ def delete_player(db: Session, player_id: int) -> None:
         raise BusinessRuleError("Jogador com clube não pode ser excluído.")
     player.excluido_em = now()
     db.commit()
-    
-def _sort_key(criteria: tuple[str, ...] | str):
-    if isinstance(criteria, str):
-        criteria = (criteria,)
 
+
+def _sort_key(criteria: tuple[str, ...]):
     def key(item: PlayerOut):
         return (
             *(_SORT_KEYS[c](item) for c in criteria),

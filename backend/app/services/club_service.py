@@ -1,18 +1,26 @@
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
 from app.core.clock import now
 from app.core.errors import BusinessRuleError, NotFoundError
 from app.domain.rules import INITIAL_CASH, MAX_CLUBS, penalty_rate, remaining_days
 from app.models import Clube, Contrato, Jogador
 from app.repositories import club_repository, contract_repository, player_repository
 from app.schemas.clubs_schema import (
-    ClubCreate, ClubDetailOut, ClubListQuery, ClubOut, ContractOut, SquadPlayerOut,
+    ClubCreate,
+    ClubDetailOut,
+    ClubListQuery,
+    ClubOut,
+    ContractOut,
+    SquadPlayerOut,
 )
 from app.services.player_mapper import market_value_of, to_player_out
-from app.utils.validators import POSITIONS, fold_text, squad_sort_key
+from app.utils.validators import fold_text, squad_sort_key
+
 
 def create_club(db: Session, data: ClubCreate) -> ClubOut:
     if club_repository.count(db) >= MAX_CLUBS:
@@ -26,10 +34,11 @@ def create_club(db: Session, data: ClubCreate) -> ClubOut:
     club_repository.add(db, club)
     try:
         db.commit()
-    except IntegrityError:  
+    except IntegrityError:
         db.rollback()
-        raise BusinessRuleError("Já existe um clube com esse nome ou sigla.")
+        raise BusinessRuleError("Já existe um clube com esse nome ou sigla.") from None
     return _to_club_out(club, [])
+
 
 def get_club(db: Session, club_id: int) -> ClubDetailOut:
     club = club_repository.get(db, club_id)
@@ -54,6 +63,7 @@ def get_club(db: Session, club_id: int) -> ClubDetailOut:
         ],
     )
 
+
 def list_clubs(db: Session, query: ClubListQuery) -> list[ClubOut]:
     players_by_club: dict[int, list[Jogador]] = defaultdict(list)
     for player in player_repository.list_in_clubs(db):
@@ -63,6 +73,7 @@ def list_clubs(db: Session, query: ClubListQuery) -> list[ClubOut]:
     clubs.sort(key=_club_sort_key(query.sort))
     return clubs
 
+
 def _club_sort_key(sort: str):
     def key(club: ClubOut):
         name_and_id = (fold_text(club.name), club.id)
@@ -71,7 +82,9 @@ def _club_sort_key(sort: str):
         if sort == "net_worth_desc":
             return (-club.net_worth, *name_and_id)
         return name_and_id
+
     return key
+
 
 def _to_club_out(club: Clube, players: list[Jogador]) -> ClubOut:
     squad_value = sum((market_value_of(player) for player in players), Decimal("0.00"))
@@ -83,6 +96,7 @@ def _to_club_out(club: Clube, players: list[Jogador]) -> ClubOut:
         squad_value=squad_value,
         net_worth=club.caixa + squad_value,
     )
+
 
 def _to_contract_out(contract: Contrato, moment: datetime) -> ContractOut:
     days = remaining_days(contract.fidelidade_ate, moment)

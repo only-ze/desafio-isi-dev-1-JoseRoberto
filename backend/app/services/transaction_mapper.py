@@ -1,6 +1,7 @@
 from app.models import Transacao
 from app.schemas.market_schema import TransactionOut
 
+
 def to_transaction_out(transaction: Transacao) -> TransactionOut:
     return TransactionOut(
         id=transaction.id,

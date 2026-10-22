@@ -1,8 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
+
 from sqlalchemy import CheckConstraint, ForeignKey, Index, Integer, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.models.base import Base, timestamp
+
 
 class Transacao(Base):
     __tablename__ = "transacoes"
