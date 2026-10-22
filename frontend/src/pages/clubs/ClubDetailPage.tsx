@@ -118,7 +118,14 @@ export function ClubDetailPage() {
         </TabsContent>
       </Tabs>
 
-      {sellTarget && <SellDialog player={sellTarget} onClose={() => setSellTarget(null)} onSold={club.reload} />}
+      {sellTarget && (
+        <SellDialog
+          player={sellTarget}
+          clubName={detail.name}
+          onClose={() => setSellTarget(null)}
+          onSold={club.reload}
+        />
+      )}
     </>
   );
 }

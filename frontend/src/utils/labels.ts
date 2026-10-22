@@ -26,5 +26,7 @@ export const TRANSACTION_TYPE_LABEL: Record<TransactionType, string> = {
   VENDA: "Venda",
 };
 
+export type ContractStatus = "ATIVO" | "ENCERRADO" | "RESCINDIDO";
+
 export const FORMATIONS =["3-1", "2-2", "2-1-1", "1-2-1"] as const;
 export type Formation = (typeof FORMATIONS)[number];

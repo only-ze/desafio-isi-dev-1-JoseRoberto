@@ -1,14 +1,16 @@
-import { ArrowRight, CheckCircle2, Info, Loader2, RefreshCw, Shield, ShoppingCart } from "lucide-react";
+import { ArrowRight, Info, Shield, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { errorMessage, isNetworkError } from "@/api/http";
 import { buyPlayer } from "@/api/market";
+import { ActionFailureNotice, toActionFailure, type ActionFailure } from "@/components/ActionFailureNotice";
+import { ContractStatusBadge } from "@/components/badges";
 import { FormField } from "@/components/FormField";
 import { Notice } from "@/components/Notice";
 import { PlayerSummary } from "@/components/PlayerSummary";
 import { ResultList } from "@/components/ResultList";
-import { Badge } from "@/components/ui/badge";
+import { SubmitButton } from "@/components/SubmitButton";
+import { SuccessHeader } from "@/components/SuccessHeader";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,25 +34,12 @@ interface BuyDialogProps {
   onBought: () => void;
 }
 
-interface Failure {
-  network: boolean;
-  message: string;
-}
-
 function BuyResultDialog({ result, club, onClose }: { result: BuyResult; club: Club | undefined; onClose: () => void }) {
   const clubName = club?.name ?? "clube";
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <div className="flex size-9 items-center justify-center rounded-full bg-green-50 text-green-700">
-          <CheckCircle2 className="size-5" />
-        </div>
-        <DialogHeader>
-          <DialogTitle>Compra concluída</DialogTitle>
-          <DialogDescription>
-            {result.player_name} agora é do {clubName}.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-125">
+        <SuccessHeader title="Compra concluída" description={`${result.player_name} agora é do ${clubName}.`} />
         <ResultList
           items={[
             { label: "Valor", hint: "Valor de mercado no momento da compra", value: formatMoney(result.value) },
@@ -68,12 +57,7 @@ function BuyResultDialog({ result, club, onClose }: { result: BuyResult; club: C
             { label: "Fim da fidelidade", value: formatDateTime(result.contract.loyalty_until) },
             {
               label: "Contrato",
-              value: (
-                <Badge variant="outline" className="gap-1.5 border-green-200 bg-green-50 text-green-700">
-                  <span className="size-1.5 rounded-full bg-current" aria-hidden />
-                  {result.contract.status}
-                </Badge>
-              ),
+              value: <ContractStatusBadge status={result.contract.status} />,
             },
             { label: `Novo caixa do ${clubName}`, value: formatMoney(result.club_cash), strong: true },
           ]}
@@ -96,7 +80,7 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [errors, setErrors] = useState<{ club?: string; loyalty?: string }>({});
-  const [failure, setFailure] = useState<Failure | null>(null);
+  const [failure, setFailure] = useState<ActionFailure | null>(null);
   const [result, setResult] = useState<BuyResult | null>(null);
   const selectedClub = clubs.find((club) => String(club.id) === clubId);
 
@@ -108,7 +92,7 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
         setResult(bought);
         onBought();
       },
-      onError: (error) => setFailure({ network: isNetworkError(error), message: errorMessage(error) }),
+      onError: (error) => setFailure(toActionFailure(error)),
     },
   );
 
@@ -139,22 +123,13 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
 
   return (
     <Dialog open onOpenChange={(open) => !open && !buy.pending && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-140">
         <DialogHeader>
           <DialogTitle>Comprar jogador</DialogTitle>
           <DialogDescription>Escolha o clube comprador e até quando vai a fidelidade do contrato.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {failure &&
-            (failure.network ? (
-              <Notice tone="error" title="Sem conexão">
-                A compra não foi confirmada. Verifique a conexão e tente de novo.
-              </Notice>
-            ) : (
-              <Notice tone="error" title="Compra recusada">
-                {failure.message}
-              </Notice>
-            ))}
+          <ActionFailureNotice failure={failure} refusedTitle="Compra recusada" action="compra" />
           <PlayerSummary player={player} />
           <FormField
             id="club"
@@ -167,9 +142,13 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
             }
           >
             <Select value={clubId} onValueChange={chooseClub} disabled={buy.pending}>
-              <SelectTrigger id="club" className="w-full" aria-invalid={Boolean(errors.club)}>
+              <SelectTrigger
+                id="club"
+                className="w-full *:data-[slot=select-value]:flex-1"
+                aria-invalid={Boolean(errors.club)}
+              >
                 <Shield className="text-muted-foreground" />
-                <SelectValue placeholder="Escolha o clube" className="flex-1 text-left" />
+                <SelectValue placeholder="Escolha o clube" />
               </SelectTrigger>
               <SelectContent>
                 {clubs.map((club) => (
@@ -215,21 +194,14 @@ export function BuyDialog({ player, clubs, clubsError, onClose, onBought }: BuyD
           <Button variant="outline" disabled={buy.pending} onClick={onClose}>
             Cancelar
           </Button>
-          <Button disabled={buy.pending} onClick={submit}>
-            {buy.pending ? (
-              <>
-                <Loader2 className="animate-spin" /> Comprando…
-              </>
-            ) : failure?.network ? (
-              <>
-                <RefreshCw /> Tentar de novo
-              </>
-            ) : (
-              <>
-                <ShoppingCart /> Confirmar compra
-              </>
-            )}
-          </Button>
+          <SubmitButton
+            label="Confirmar compra"
+            pendingLabel="Comprando…"
+            icon={ShoppingCart}
+            pending={buy.pending}
+            retry={failure?.network}
+            onClick={submit}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

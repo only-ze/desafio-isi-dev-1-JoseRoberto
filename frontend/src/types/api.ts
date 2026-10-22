@@ -1,4 +1,4 @@
-import type { Condition, Formation, Position, TransactionType } from "@/utils/labels";
+import type { Condition, ContractStatus, Formation, Position, TransactionType } from "@/utils/labels";
 
 export interface Player {
   id: number;
@@ -93,7 +93,7 @@ export interface Transaction {
 }
 
 export interface BuyResult extends Transaction {
-  contract: { purchase_value: number; loyalty_until: string; status: string };
+  contract: { purchase_value: number; loyalty_until: string; status: ContractStatus };
   club_cash: number;
 }
 
@@ -101,7 +101,7 @@ export interface SellResult extends Transaction {
   purchase_value: number;
   remaining_days: number;
   penalty_rate: number;
-  contract_status: string;
+  contract_status: ContractStatus;
   club_cash: number;
 }
 
