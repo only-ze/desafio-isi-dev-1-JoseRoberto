@@ -4,7 +4,7 @@ import { saveLineup } from "@/api/clubs";
 import { errorMessage } from "@/api/http";
 import { ConditionBadge } from "@/components/badges";
 import { Notice } from "@/components/Notice";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAction } from "@/hooks/useAction";
 import type { Lineup, Player, SquadPlayer } from "@/types/api";
-import { initials } from "@/utils/format";
 import { POSITION_LABEL, type Formation } from "@/utils/labels";
 import { FormationPicker } from "./FormationPicker";
 import { LineupPitch } from "./LineupPitch";
@@ -75,9 +74,7 @@ function ReservesCard({ reserves, squadSize }: { reserves: SquadPlayer[]; squadS
           {reserves.map((player) => (
             <li key={player.id} className="space-y-2 p-4">
               <div className="flex items-center gap-3">
-                <Avatar className="size-8">
-                  <AvatarFallback className="text-xs">{initials(player.name)}</AvatarFallback>
-                </Avatar>
+                <PlayerAvatar id={player.id} name={player.name} />
                 <div className="flex-1 leading-tight">
                   <p className="text-sm font-medium">{player.name}</p>
                   <p className="text-xs text-muted-foreground">{POSITION_LABEL[player.position]}</p>

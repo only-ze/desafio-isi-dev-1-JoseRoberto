@@ -1,14 +1,12 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 import type { Player } from "@/types/api";
-import { formatMoney, initials } from "@/utils/format";
+import { formatMoney } from "@/utils/format";
 import { POSITION_LABEL } from "@/utils/labels";
 
 export function PlayerSummary({ player }: { player: Player }) {
   return (
     <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3">
-      <Avatar className="size-8">
-        <AvatarFallback className="text-xs">{initials(player.name)}</AvatarFallback>
-      </Avatar>
+      <PlayerAvatar id={player.id} name={player.name} />
       <div className="flex-1 leading-tight">
         <p className="text-sm font-medium">{player.name}</p>
         <p className="text-xs text-muted-foreground">

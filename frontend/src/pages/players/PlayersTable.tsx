@@ -1,7 +1,7 @@
 import { MoreHorizontal, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ConditionBadge, PositionBadge } from "@/components/badges";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import type { Club, Player } from "@/types/api";
-import { formatMoney, initials } from "@/utils/format";
+import { formatMoney } from "@/utils/format";
 import { POSITION_LABEL } from "@/utils/labels";
 
 interface PlayersTableProps {
@@ -77,9 +77,7 @@ export function PlayersTable({ players, clubsById, onBuy, onEdit, onChangeCondit
             <TableRow key={player.id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Avatar className="size-8">
-                    <AvatarFallback className="text-xs">{initials(player.name)}</AvatarFallback>
-                  </Avatar>
+                  <PlayerAvatar id={player.id} name={player.name} />
                   <div className="leading-tight">
                     <p className="font-medium whitespace-nowrap">{player.name}</p>
                     <p className="text-xs text-muted-foreground">{POSITION_LABEL[player.position]}</p>

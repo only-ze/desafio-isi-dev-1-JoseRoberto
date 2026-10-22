@@ -1,9 +1,9 @@
 import { ConditionBadge, PositionBadge } from "@/components/badges";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { SquadPlayer } from "@/types/api";
-import { formatDateTime, formatMoney, initials } from "@/utils/format";
+import { formatDateTime, formatMoney } from "@/utils/format";
 import { POSITION_LABEL } from "@/utils/labels";
 
 interface SquadTableProps {
@@ -34,9 +34,7 @@ export function SquadTable({ players, onSell }: SquadTableProps) {
           <TableRow key={player.id}>
             <TableCell>
               <div className="flex items-center gap-3">
-                <Avatar className="size-8">
-                  <AvatarFallback className="text-xs">{initials(player.name)}</AvatarFallback>
-                </Avatar>
+                <PlayerAvatar id={player.id} name={player.name} />
                 <div className="leading-tight">
                   <p className="font-medium whitespace-nowrap">{player.name}</p>
                   <p className="text-xs text-muted-foreground">{POSITION_LABEL[player.position]}</p>
